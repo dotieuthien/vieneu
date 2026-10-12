@@ -1,0 +1,95 @@
+{
+  "before_load": [
+    {
+      "timestamp": "2026/10/12 19:14:44.283",
+      "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+      "name": "NVIDIA GeForce RTX 3060",
+      "driver_version": "595.104.02",
+      "pstate": "P8",
+      "utilization.gpu": "0",
+      "memory.used": "1",
+      "power.draw": "20.87",
+      "power.limit": "120.00",
+      "temperature.gpu": "52",
+      "clocks.current.graphics": "210",
+      "clocks.current.memory": "405"
+    },
+    {
+      "timestamp": "2026/10/12 19:14:45.381",
+      "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+      "name": "NVIDIA GeForce RTX 3060",
+      "driver_version": "595.104.02",
+      "pstate": "P8",
+      "utilization.gpu": "0",
+      "memory.used": "1",
+      "power.draw": "20.81",
+      "power.limit": "120.00",
+      "temperature.gpu": "52",
+      "clocks.current.graphics": "210",
+      "clocks.current.memory": "405"
+    },
+    {
+      "timestamp": "2026/10/12 19:14:46.440",
+      "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+      "name": "NVIDIA GeForce RTX 3060",
+      "driver_version": "595.104.02",
+      "pstate": "P8",
+      "utilization.gpu": "0",
+      "memory.used": "1",
+      "power.draw": "20.77",
+      "power.limit": "120.00",
+      "temperature.gpu": "52",
+      "clocks.current.graphics": "210",
+      "clocks.current.memory": "405"
+    },
+    {
+      "timestamp": "2026/10/12 19:14:47.496",
+      "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+      "name": "NVIDIA GeForce RTX 3060",
+      "driver_version": "595.104.02",
+      "pstate": "P8",
+      "utilization.gpu": "0",
+      "memory.used": "1",
+      "power.draw": "20.72",
+      "power.limit": "120.00",
+      "temperature.gpu": "51",
+      "clocks.current.graphics": "210",
+      "clocks.current.memory": "405"
+    },
+    {
+      "timestamp": "2026/10/12 19:14:48.550",
+      "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+      "name": "NVIDIA GeForce RTX 3060",
+      "driver_version": "595.104.02",
+      "pstate": "P8",
+      "utilization.gpu": "0",
+      "memory.used": "1",
+      "power.draw": "20.66",
+      "power.limit": "120.00",
+      "temperature.gpu": "51",
+      "clocks.current.graphics": "210",
+      "clocks.current.memory": "405"
+    }
+  ],
+  "idle_pass": true,
+  "clock_lock": {
+    "requested_mhz": 1500,
+    "returncode": 4,
+    "stdout": "The current user does not have permission to change clocks for GPU 00000000:0E:00.0.\nTerminating early due to previous errors.\n",
+    "stderr": ""
+  },
+  "after_lock": {
+    "timestamp": "2026/10/12 19:14:48.682",
+    "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+    "name": "NVIDIA GeForce RTX 3060",
+    "driver_version": "595.104.02",
+    "pstate": "P8",
+    "utilization.gpu": "0",
+    "memory.used": "1",
+    "power.draw": "20.66",
+    "power.limit": "120.00",
+    "temperature.gpu": "51",
+    "clocks.current.graphics": "210",
+    "clocks.current.memory": "405"
+  }
+}

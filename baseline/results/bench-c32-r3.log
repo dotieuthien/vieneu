@@ -1,0 +1,2 @@
+server: backend=pytorch max_streams=16 active=None
+32 client (32 ok, 0 lỗi/429): TTFA median 1548 ms, max 3354 ms | RTF max 1.47 (cần < 1) | 5.9s tổng

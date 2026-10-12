@@ -1,0 +1,10 @@
+{
+  "benchmark.py": "de15ee8171f948426bb7b04211b1705246334367abe3c3b2b5f91c84e9e08fc3",
+  "serve.py": "b2d036fa15bbfa3cebee24628a0fbcae9c98b944fb4637ae1cbb02a35ed6de9a",
+  "bench_support.py": "baad6d597af94acd9dc617752b3cd093ece88eab967ae1039bb8b6401d98f530",
+  "requirements.txt": "1c312ab97c01d5c0057092642d930be36e30a661d2bf164e61f0e83ad59dd419",
+  "vieneu_lite/__init__.py": "4445b3eee2f862bd3fa0de1466600a3b588bff83e70c4317700b09312323fe27",
+  "vieneu_lite/frame.py": "c8db6471eb30bf5dbfbd936747ed9fc5a9bdad7d7cf4127cdc0820cbebb9835f",
+  "vieneu_lite/scheduler.py": "6a769e858a895174b69bb06f9cd64484929111cc2b51ee8b2f556db82c949fe0",
+  "vieneu_lite/tts.py": "a9cafd64ceb79d13875b823dc30b8e594294ba4ddc3c96b3ad3818c093a8a844"
+}

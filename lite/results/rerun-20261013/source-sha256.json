@@ -1,0 +1,10 @@
+{
+  "serve.py": "2640a0fc294729f67c8c655c56e3fdc8b5bcfe8a8f81ee48c9d13864bc70797f",
+  "benchmark.py": "f2e1edf08fc3c2fea9c203c7ed4416a881d55d359bec751e005866872782abfb",
+  "requirements.txt": "1c312ab97c01d5c0057092642d930be36e30a661d2bf164e61f0e83ad59dd419",
+  "vkong.yaml": "5c01c3e11343ed18ee413735602debb0f7457b041e145c79d4b10b9c29701f20",
+  "vieneu_lite/__init__.py": "4445b3eee2f862bd3fa0de1466600a3b588bff83e70c4317700b09312323fe27",
+  "vieneu_lite/frame.py": "c8db6471eb30bf5dbfbd936747ed9fc5a9bdad7d7cf4127cdc0820cbebb9835f",
+  "vieneu_lite/scheduler.py": "6a769e858a895174b69bb06f9cd64484929111cc2b51ee8b2f556db82c949fe0",
+  "vieneu_lite/tts.py": "a9cafd64ceb79d13875b823dc30b8e594294ba4ddc3c96b3ad3818c093a8a844"
+}

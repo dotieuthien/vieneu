@@ -1,0 +1,19 @@
+{
+  "status": "ok",
+  "backend": "pytorch-lite",
+  "gpu": "NVIDIA GeForce RTX 3060",
+  "sample_rate": 48000,
+  "max_streams": 32,
+  "decode_frames": 4,
+  "leadin_frames": 2,
+  "active": 0,
+  "pending": 0,
+  "watermark": false,
+  "cuda": "12.8",
+  "versions": {
+    "vieneu": "3.8.3",
+    "torch": "2.8.0+cu128",
+    "transformers": "4.57.6",
+    "sea-g2p": "0.10.0"
+  }
+}

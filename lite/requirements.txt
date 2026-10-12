@@ -1,0 +1,5 @@
+vieneu[cuda]==3.8.3
+transformers==4.57.6
+fastapi==0.120.2
+uvicorn==0.38.0
+requests==2.32.5

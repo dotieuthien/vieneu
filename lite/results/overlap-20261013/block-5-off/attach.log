@@ -1,0 +1,286 @@
+  [debug] dial control
+  [debug] control session up
+→ Checking project
+✓ Project checked
+✓ Machine ready · vk_8ea7a305851f137e
+→ Preparing the project
+✓ Project prepared
+→ Starting the workload
+Requirement already satisfied: vieneu==3.8.3 in /opt/conda/lib/python3.11/site-packages (from vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (3.8.3)
+Requirement already satisfied: transformers==4.57.6 in /opt/conda/lib/python3.11/site-packages (from -r requirements.txt (line 2)) (4.57.6)
+Requirement already satisfied: fastapi==0.120.2 in /opt/conda/lib/python3.11/site-packages (from -r requirements.txt (line 3)) (0.120.2)
+Requirement already satisfied: uvicorn==0.38.0 in /opt/conda/lib/python3.11/site-packages (from -r requirements.txt (line 4)) (0.38.0)
+Requirement already satisfied: requests==2.32.5 in /opt/conda/lib/python3.11/site-packages (from -r requirements.txt (line 5)) (2.32.5)
+Requirement already satisfied: sea-g2p>=0.9.1 in /opt/conda/lib/python3.11/site-packages (from vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (0.10.0)
+Requirement already satisfied: onnxruntime>=1.20.0 in /opt/conda/lib/python3.11/site-packages (from vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (1.31.0)
+Requirement already satisfied: numpy in /opt/conda/lib/python3.11/site-packages (from vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (2.3.2)
+Requirement already satisfied: soundfile in /opt/conda/lib/python3.11/site-packages (from vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (0.14.0)
+Requirement already satisfied: soxr in /opt/conda/lib/python3.11/site-packages (from vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (1.1.0)
+Requirement already satisfied: kaldi-native-fbank>=1.20 in /opt/conda/lib/python3.11/site-packages (from vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (1.22.3)
+Requirement already satisfied: tokenizers>=0.20 in /opt/conda/lib/python3.11/site-packages (from vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (0.22.2)
+Requirement already satisfied: huggingface_hub in /opt/conda/lib/python3.11/site-packages (from vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (0.36.2)
+Requirement already satisfied: PyYAML in /opt/conda/lib/python3.11/site-packages (from vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (6.0.2)
+Requirement already satisfied: gradio>=5.49.1 in /opt/conda/lib/python3.11/site-packages (from vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (6.15.1)
+Requirement already satisfied: librosa>=0.11.0 in /opt/conda/lib/python3.11/site-packages (from vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (0.11.0)
+Requirement already satisfied: filelock in /opt/conda/lib/python3.11/site-packages (from transformers==4.57.6->-r requirements.txt (line 2)) (3.18.0)
+Requirement already satisfied: packaging>=20.0 in /opt/conda/lib/python3.11/site-packages (from transformers==4.57.6->-r requirements.txt (line 2)) (25.0)
+Requirement already satisfied: regex!=2019.12.17 in /opt/conda/lib/python3.11/site-packages (from transformers==4.57.6->-r requirements.txt (line 2)) (2026.9.29)
+Requirement already satisfied: safetensors>=0.4.3 in /opt/conda/lib/python3.11/site-packages (from transformers==4.57.6->-r requirements.txt (line 2)) (0.8.0)
+Requirement already satisfied: tqdm>=4.27 in /opt/conda/lib/python3.11/site-packages (from transformers==4.57.6->-r requirements.txt (line 2)) (4.67.1)
+Requirement already satisfied: starlette<0.50.0,>=0.40.0 in /opt/conda/lib/python3.11/site-packages (from fastapi==0.120.2->-r requirements.txt (line 3)) (0.49.3)
+Requirement already satisfied: pydantic!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0,>=1.7.4 in /opt/conda/lib/python3.11/site-packages (from fastapi==0.120.2->-r requirements.txt (line 3)) (2.14.1)
+Requirement already satisfied: typing-extensions>=4.8.0 in /opt/conda/lib/python3.11/site-packages (from fastapi==0.120.2->-r requirements.txt (line 3)) (4.16.0)
+Requirement already satisfied: annotated-doc>=0.0.2 in /opt/conda/lib/python3.11/site-packages (from fastapi==0.120.2->-r requirements.txt (line 3)) (0.0.5)
+Requirement already satisfied: click>=7.0 in /opt/conda/lib/python3.11/site-packages (from uvicorn==0.38.0->-r requirements.txt (line 4)) (8.2.1)
+Requirement already satisfied: h11>=0.8 in /opt/conda/lib/python3.11/site-packages (from uvicorn==0.38.0->-r requirements.txt (line 4)) (0.16.0)
+Requirement already satisfied: charset_normalizer<4,>=2 in /opt/conda/lib/python3.11/site-packages (from requests==2.32.5->-r requirements.txt (line 5)) (3.4.2)
+Requirement already satisfied: idna<4,>=2.5 in /opt/conda/lib/python3.11/site-packages (from requests==2.32.5->-r requirements.txt (line 5)) (3.10)
+Requirement already satisfied: urllib3<3,>=1.21.1 in /opt/conda/lib/python3.11/site-packages (from requests==2.32.5->-r requirements.txt (line 5)) (2.5.0)
+Requirement already satisfied: certifi>=2017.4.17 in /opt/conda/lib/python3.11/site-packages (from requests==2.32.5->-r requirements.txt (line 5)) (2025.8.3)
+Requirement already satisfied: torch==2.8.0 in /opt/conda/lib/python3.11/site-packages (from vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (2.8.0+cu128)
+Requirement already satisfied: torchaudio==2.8.0 in /opt/conda/lib/python3.11/site-packages (from vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (2.8.0+cu128)
+Requirement already satisfied: sympy>=1.13.3 in /opt/conda/lib/python3.11/site-packages (from torch==2.8.0->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (1.14.0)
+Requirement already satisfied: networkx in /opt/conda/lib/python3.11/site-packages (from torch==2.8.0->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (3.5)
+Requirement already satisfied: jinja2 in /opt/conda/lib/python3.11/site-packages (from torch==2.8.0->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (3.1.6)
+Requirement already satisfied: fsspec in /opt/conda/lib/python3.11/site-packages (from torch==2.8.0->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (2025.7.0)
+Requirement already satisfied: nvidia-cuda-nvrtc-cu12==12.8.93 in /opt/conda/lib/python3.11/site-packages (from torch==2.8.0->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (12.8.93)
+Requirement already satisfied: nvidia-cuda-runtime-cu12==12.8.90 in /opt/conda/lib/python3.11/site-packages (from torch==2.8.0->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (12.8.90)
+Requirement already satisfied: nvidia-cuda-cupti-cu12==12.8.90 in /opt/conda/lib/python3.11/site-packages (from torch==2.8.0->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (12.8.90)
+Requirement already satisfied: nvidia-cudnn-cu12==9.10.2.21 in /opt/conda/lib/python3.11/site-packages (from torch==2.8.0->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (9.10.2.21)
+Requirement already satisfied: nvidia-cublas-cu12==12.8.4.1 in /opt/conda/lib/python3.11/site-packages (from torch==2.8.0->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (12.8.4.1)
+Requirement already satisfied: nvidia-cufft-cu12==11.3.3.83 in /opt/conda/lib/python3.11/site-packages (from torch==2.8.0->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (11.3.3.83)
+Requirement already satisfied: nvidia-curand-cu12==10.3.9.90 in /opt/conda/lib/python3.11/site-packages (from torch==2.8.0->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (10.3.9.90)
+Requirement already satisfied: nvidia-cusolver-cu12==11.7.3.90 in /opt/conda/lib/python3.11/site-packages (from torch==2.8.0->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (11.7.3.90)
+Requirement already satisfied: nvidia-cusparse-cu12==12.5.8.93 in /opt/conda/lib/python3.11/site-packages (from torch==2.8.0->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (12.5.8.93)
+Requirement already satisfied: nvidia-cusparselt-cu12==0.7.1 in /opt/conda/lib/python3.11/site-packages (from torch==2.8.0->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (0.7.1)
+Requirement already satisfied: nvidia-nccl-cu12==2.27.3 in /opt/conda/lib/python3.11/site-packages (from torch==2.8.0->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (2.27.3)
+Requirement already satisfied: nvidia-nvtx-cu12==12.8.90 in /opt/conda/lib/python3.11/site-packages (from torch==2.8.0->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (12.8.90)
+Requirement already satisfied: nvidia-nvjitlink-cu12==12.8.93 in /opt/conda/lib/python3.11/site-packages (from torch==2.8.0->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (12.8.93)
+Requirement already satisfied: nvidia-cufile-cu12==1.13.1.3 in /opt/conda/lib/python3.11/site-packages (from torch==2.8.0->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (1.13.1.3)
+Requirement already satisfied: triton==3.4.0 in /opt/conda/lib/python3.11/site-packages (from torch==2.8.0->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (3.4.0)
+Requirement already satisfied: setuptools>=40.8.0 in /opt/conda/lib/python3.11/site-packages (from triton==3.4.0->torch==2.8.0->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (79.0.1)
+Requirement already satisfied: hf-xet<2.0.0,>=1.1.3 in /opt/conda/lib/python3.11/site-packages (from huggingface_hub->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (1.7.0)
+Requirement already satisfied: annotated-types>=0.6.0 in /opt/conda/lib/python3.11/site-packages (from pydantic!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0,>=1.7.4->fastapi==0.120.2->-r requirements.txt (line 3)) (0.8.0)
+Requirement already satisfied: pydantic-core==2.50.1 in /opt/conda/lib/python3.11/site-packages (from pydantic!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0,>=1.7.4->fastapi==0.120.2->-r requirements.txt (line 3)) (2.50.1)
+Requirement already satisfied: typing-inspection>=0.4.4 in /opt/conda/lib/python3.11/site-packages (from pydantic!=1.8,!=1.8.1,!=2.0.0,!=2.0.1,!=2.1.0,<3.0.0,>=1.7.4->fastapi==0.120.2->-r requirements.txt (line 3)) (0.4.4)
+Requirement already satisfied: anyio<5,>=3.6.2 in /opt/conda/lib/python3.11/site-packages (from starlette<0.50.0,>=0.40.0->fastapi==0.120.2->-r requirements.txt (line 3)) (4.15.1)
+Requirement already satisfied: brotli>=1.1.0 in /opt/conda/lib/python3.11/site-packages (from gradio>=5.49.1->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (1.1.0)
+Requirement already satisfied: gradio-client==2.5.0 in /opt/conda/lib/python3.11/site-packages (from gradio>=5.49.1->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (2.5.0)
+Requirement already satisfied: groovy~=0.1 in /opt/conda/lib/python3.11/site-packages (from gradio>=5.49.1->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (0.1.2)
+Requirement already satisfied: hf-gradio<1.0,>=0.4.1 in /opt/conda/lib/python3.11/site-packages (from gradio>=5.49.1->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (0.4.1)
+Requirement already satisfied: httpx<1.0,>=0.24.1 in /opt/conda/lib/python3.11/site-packages (from gradio>=5.49.1->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (0.28.1)
+Requirement already satisfied: markupsafe<4.0,>=2.0 in /opt/conda/lib/python3.11/site-packages (from gradio>=5.49.1->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (3.0.2)
+Requirement already satisfied: orjson~=3.0 in /opt/conda/lib/python3.11/site-packages (from gradio>=5.49.1->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (3.13.0)
+Requirement already satisfied: pandas<4.0,>=1.0 in /opt/conda/lib/python3.11/site-packages (from gradio>=5.49.1->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (3.0.6)
+Requirement already satisfied: pillow<13.0,>=8.0 in /opt/conda/lib/python3.11/site-packages (from gradio>=5.49.1->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (11.0.0)
+Requirement already satisfied: pydub<1.0 in /opt/conda/lib/python3.11/site-packages (from gradio>=5.49.1->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (0.25.1)
+Requirement already satisfied: python-multipart<1.0,>=0.0.18 in /opt/conda/lib/python3.11/site-packages (from gradio>=5.49.1->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (0.0.32)
+Requirement already satisfied: pytz>=2017.2 in /opt/conda/lib/python3.11/site-packages (from gradio>=5.49.1->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (2025.2)
+Requirement already satisfied: safehttpx<0.2.0,>=0.1.7 in /opt/conda/lib/python3.11/site-packages (from gradio>=5.49.1->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (0.1.7)
+Requirement already satisfied: semantic-version~=2.0 in /opt/conda/lib/python3.11/site-packages (from gradio>=5.49.1->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (2.10.0)
+Requirement already satisfied: tomlkit<0.15.0,>=0.12.0 in /opt/conda/lib/python3.11/site-packages (from gradio>=5.49.1->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (0.14.0)
+Requirement already satisfied: typer<1.0,>=0.12 in /opt/conda/lib/python3.11/site-packages (from gradio>=5.49.1->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (0.27.3)
+Requirement already satisfied: httpcore==1.* in /opt/conda/lib/python3.11/site-packages (from httpx<1.0,>=0.24.1->gradio>=5.49.1->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (1.0.9)
+Requirement already satisfied: python-dateutil>=2.8.2 in /opt/conda/lib/python3.11/site-packages (from pandas<4.0,>=1.0->gradio>=5.49.1->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (2.9.0.post0)
+Requirement already satisfied: shellingham>=1.3.0 in /opt/conda/lib/python3.11/site-packages (from typer<1.0,>=0.12->gradio>=5.49.1->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (1.5.4)
+Requirement already satisfied: rich>=13.8.0 in /opt/conda/lib/python3.11/site-packages (from typer<1.0,>=0.12->gradio>=5.49.1->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (15.0.0)
+Requirement already satisfied: audioread>=2.1.9 in /opt/conda/lib/python3.11/site-packages (from librosa>=0.11.0->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (3.1.0)
+Requirement already satisfied: numba>=0.51.0 in /opt/conda/lib/python3.11/site-packages (from librosa>=0.11.0->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (0.68.0)
+Requirement already satisfied: scipy>=1.6.0 in /opt/conda/lib/python3.11/site-packages (from librosa>=0.11.0->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (1.17.1)
+Requirement already satisfied: scikit-learn>=1.1.0 in /opt/conda/lib/python3.11/site-packages (from librosa>=0.11.0->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (1.9.1)
+Requirement already satisfied: joblib>=1.0 in /opt/conda/lib/python3.11/site-packages (from librosa>=0.11.0->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (1.6.0)
+Requirement already satisfied: decorator>=4.3.0 in /opt/conda/lib/python3.11/site-packages (from librosa>=0.11.0->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (5.2.1)
+Requirement already satisfied: pooch>=1.1 in /opt/conda/lib/python3.11/site-packages (from librosa>=0.11.0->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (1.9.0)
+Requirement already satisfied: lazy_loader>=0.1 in /opt/conda/lib/python3.11/site-packages (from librosa>=0.11.0->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (0.6)
+Requirement already satisfied: msgpack>=1.0 in /opt/conda/lib/python3.11/site-packages (from librosa>=0.11.0->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (1.1.1)
+Requirement already satisfied: cloudpickle>=3.0 in /opt/conda/lib/python3.11/site-packages (from joblib>=1.0->librosa>=0.11.0->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (3.1.2)
+Requirement already satisfied: llvmlite<0.51,>=0.50.0dev0 in /opt/conda/lib/python3.11/site-packages (from numba>=0.51.0->librosa>=0.11.0->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (0.50.0)
+Requirement already satisfied: flatbuffers in /opt/conda/lib/python3.11/site-packages (from onnxruntime>=1.20.0->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (25.12.19)
+Requirement already satisfied: protobuf>=4.25.8 in /opt/conda/lib/python3.11/site-packages (from onnxruntime>=1.20.0->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (7.36.2)
+Requirement already satisfied: platformdirs>=2.5.0 in /opt/conda/lib/python3.11/site-packages (from pooch>=1.1->librosa>=0.11.0->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (4.3.8)
+Requirement already satisfied: six>=1.5 in /opt/conda/lib/python3.11/site-packages (from python-dateutil>=2.8.2->pandas<4.0,>=1.0->gradio>=5.49.1->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (1.17.0)
+Requirement already satisfied: markdown-it-py>=2.2.0 in /opt/conda/lib/python3.11/site-packages (from rich>=13.8.0->typer<1.0,>=0.12->gradio>=5.49.1->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (4.2.0)
+Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /opt/conda/lib/python3.11/site-packages (from rich>=13.8.0->typer<1.0,>=0.12->gradio>=5.49.1->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (2.19.2)
+Requirement already satisfied: mdurl~=0.1 in /opt/conda/lib/python3.11/site-packages (from markdown-it-py>=2.2.0->rich>=13.8.0->typer<1.0,>=0.12->gradio>=5.49.1->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (0.1.2)
+Requirement already satisfied: narwhals>=2.0.1 in /opt/conda/lib/python3.11/site-packages (from scikit-learn>=1.1.0->librosa>=0.11.0->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (2.27.1)
+Requirement already satisfied: threadpoolctl>=3.5.0 in /opt/conda/lib/python3.11/site-packages (from scikit-learn>=1.1.0->librosa>=0.11.0->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (3.7.0)
+Requirement already satisfied: cffi>=1.0 in /opt/conda/lib/python3.11/site-packages (from soundfile->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (1.17.1)
+Requirement already satisfied: pycparser in /opt/conda/lib/python3.11/site-packages (from cffi>=1.0->soundfile->vieneu==3.8.3->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (2.22)
+Requirement already satisfied: mpmath<1.4,>=1.1.0 in /opt/conda/lib/python3.11/site-packages (from sympy>=1.13.3->torch==2.8.0->vieneu[cuda]==3.8.3->-r requirements.txt (line 1)) (1.3.0)
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+INFO:     Started server process [1735]
+INFO:     Waiting for application startup.
+BENCH GPU: {"before_load": [{"timestamp": "2026/10/12 19:46:20.790", "uuid": "GPU-76a205e9-61fb-5c01-d8c9-b8d8edd85cf0", "name": "NVIDIA GeForce RTX 3060", "driver_version": "595.104.02", "pstate": "P8", "utilization.gpu": "0", "memory.used": "1", "power.draw": "17.05", "power.limit": "120.00", "temperature.gpu": "44", "clocks.current.graphics": "210", "clocks.current.memory": "405"}, {"timestamp": "2026/10/12 19:46:21.862", "uuid": "GPU-76a205e9-61fb-5c01-d8c9-b8d8edd85cf0", "name": "NVIDIA GeForce RTX 3060", "driver_version": "595.104.02", "pstate": "P8", "utilization.gpu": "0", "memory.used": "1", "power.draw": "17.04", "power.limit": "120.00", "temperature.gpu": "44", "clocks.current.graphics": "210", "clocks.current.memory": "405"}, {"timestamp": "2026/10/12 19:46:22.909", "uuid": "GPU-76a205e9-61fb-5c01-d8c9-b8d8edd85cf0", "name": "NVIDIA GeForce RTX 3060", "driver_version": "595.104.02", "pstate": "P8", "utilization.gpu": "0", "memory.used": "1", "power.draw": "17.07", "power.limit": "120.00", "temperature.gpu": "44", "clocks.current.graphics": "210", "clocks.current.memory": "405"}, {"timestamp": "2026/10/12 19:46:23.963", "uuid": "GPU-76a205e9-61fb-5c01-d8c9-b8d8edd85cf0", "name": "NVIDIA GeForce RTX 3060", "driver_version": "595.104.02", "pstate": "P8", "utilization.gpu": "0", "memory.used": "1", "power.draw": "17.07", "power.limit": "120.00", "temperature.gpu": "44", "clocks.current.graphics": "210", "clocks.current.memory": "405"}, {"timestamp": "2026/10/12 19:46:25.010", "uuid": "GPU-76a205e9-61fb-5c01-d8c9-b8d8edd85cf0", "name": "NVIDIA GeForce RTX 3060", "driver_version": "595.104.02", "pstate": "P8", "utilization.gpu": "0", "memory.used": "1", "power.draw": "17.04", "power.limit": "120.00", "temperature.gpu": "44", "clocks.current.graphics": "210", "clocks.current.memory": "405"}], "idle_pass": true, "clock_lock": {"requested_mhz": 1500, "returncode": 4, "stdout": "The current user does not have permission to change clocks for GPU 00000000:0F:00.0.\nTerminating early due to previous errors.\n", "stderr": ""}, "after_lock": {"timestamp": "2026/10/12 19:46:25.096", "uuid": "GPU-76a205e9-61fb-5c01-d8c9-b8d8edd85cf0", "name": "NVIDIA GeForce RTX 3060", "driver_version": "595.104.02", "pstate": "P8", "utilization.gpu": "0", "memory.used": "1", "power.draw": "17.04", "power.limit": "120.00", "temperature.gpu": "44", "clocks.current.graphics": "210", "clocks.current.memory": "405"}}
+Mon Oct 12 19:46:25 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.104.02             Driver Version: 595.104.02     CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 3060        On  |   00000000:0F:00.0 Off |                  N/A |
+| 68%   44C    P8             17W /  120W |       1MiB /  12288MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+2026-10-12 19:46:25,164 INFO Vieneu.V3Turbo: ⏳ Loading VieNeu-TTS v3 Turbo (PyTorch) from: pnnbao-ump/VieNeu-TTS-v3-Turbo/update ...
+2026-10-12 19:46:37,213 INFO Vieneu.V3Turbo: ✅ VieNeu-TTS v3 Turbo ready (backend=pytorch)
+2026-10-12 19:46:37,218 INFO Vieneu.V3Turbo: 📢 Loaded 25 preset voices (default: Hải Đăng)
+2026-10-12 19:46:39,311 INFO vieneu_lite.api: ready in 14.2s
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+✓ Workload running · http://127.0.0.1:50385
+✓ local app http://127.0.0.1:50385  (Ctrl+C to disconnect; machine stays)
+attach ok — tunnel :50385 → instance:8000 · service logs live
+INFO:     127.0.0.1:53518 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53528 - "GET /results/gpu-preflight.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53538 - "POST /benchmark?concurrency=1&repeats=3&seed=42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53548 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53554 - "GET /benchmark HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53560 - "GET /benchmark HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53566 - "POST /benchmark/seed?seed=42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53574 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53256 - "GET /benchmark HTTP/1.1" 200 OK
+2026-10-12 19:46:50,486 INFO vieneu_lite.api: fa13fe094f554b4eb5461fb239cac3c7 ttfa=158ms total=2.57s audio=4.32s rtf=0.60
+INFO:     127.0.0.1:53260 - "POST /benchmark/seed?seed=42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53274 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53290 - "GET /benchmark HTTP/1.1" 200 OK
+2026-10-12 19:46:52,852 INFO vieneu_lite.api: 9d3477dcb0b04c719c3eb259a248fa59 ttfa=135ms total=2.36s audio=4.00s rtf=0.59
+INFO:     127.0.0.1:53304 - "POST /benchmark/seed?seed=42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53310 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53316 - "GET /benchmark HTTP/1.1" 200 OK
+2026-10-12 19:46:55,183 INFO vieneu_lite.api: cdf8957b623f426d9f89f3e229a02c0e ttfa=138ms total=2.32s audio=3.92s rtf=0.59
+INFO:     127.0.0.1:53328 - "POST /benchmark/seed?seed=43 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53336 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-12 19:46:57,441 INFO vieneu_lite.api: 814d6681fbc64842b4b41a3cec2cf33e ttfa=135ms total=2.25s audio=3.84s rtf=0.59
+INFO:     127.0.0.1:53346 - "POST /benchmark/seed?seed=44 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53354 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53338 - "GET /benchmark HTTP/1.1" 200 OK
+2026-10-12 19:46:59,849 INFO vieneu_lite.api: 0b18cf9522e940d48b64dd4037ea9a2b ttfa=141ms total=2.40s audio=4.08s rtf=0.59
+INFO:     127.0.0.1:46798 - "GET /benchmark HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46808 - "GET /results/bench-1.log HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46824 - "GET /results/bench-1.jsonl HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46840 - "GET /results/bench-1.gpu.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46854 - "POST /benchmark?concurrency=16&repeats=1&seed=42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46866 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46874 - "GET /benchmark HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46882 - "GET /benchmark HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46884 - "POST /benchmark/seed?seed=42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46932 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46886 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46948 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46894 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46934 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46978 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46956 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46966 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46920 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46898 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46910 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47002 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46994 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46998 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46992 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47006 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47016 - "GET /benchmark HTTP/1.1" 200 OK
+2026-10-12 19:47:10,310 INFO vieneu_lite.api: 52ef4608f48d4d319301ad656fd65176 ttfa=326ms total=2.78s audio=3.76s rtf=0.74
+2026-10-12 19:47:10,310 INFO vieneu_lite.api: 5b348b40bb96458a8e5136db4a2cbe26 ttfa=320ms total=2.77s audio=3.76s rtf=0.74
+2026-10-12 19:47:10,569 INFO vieneu_lite.api: 242bae04894e4074895922eb80323be3 ttfa=322ms total=3.03s audio=4.00s rtf=0.76
+2026-10-12 19:47:10,570 INFO vieneu_lite.api: d95783dd38f54061b83ca7a46e064521 ttfa=323ms total=3.04s audio=4.16s rtf=0.73
+2026-10-12 19:47:10,573 INFO vieneu_lite.api: 8582caf893a440dbb476bef6879827e8 ttfa=537ms total=3.04s audio=3.76s rtf=0.81
+2026-10-12 19:47:10,576 INFO vieneu_lite.api: b6afc32ed761471dbe3a9719e19382c3 ttfa=326ms total=3.04s audio=4.00s rtf=0.76
+2026-10-12 19:47:10,577 INFO vieneu_lite.api: ac2907bdcbbf4aefb769daf00441d3c8 ttfa=323ms total=3.04s audio=4.08s rtf=0.75
+2026-10-12 19:47:10,578 INFO vieneu_lite.api: 1a3bd7b678df4e44bb3d59898bea63b3 ttfa=539ms total=3.05s audio=4.00s rtf=0.76
+2026-10-12 19:47:10,580 INFO vieneu_lite.api: 5f97d3fe014040fb95f53fe502da9fec ttfa=536ms total=3.05s audio=4.00s rtf=0.76
+2026-10-12 19:47:10,581 INFO vieneu_lite.api: 32f8fd208be0493d983f2228fa962c1a ttfa=538ms total=3.05s audio=4.00s rtf=0.76
+2026-10-12 19:47:10,804 INFO vieneu_lite.api: 9aeb64b84aab4959b1780b9221e67390 ttfa=319ms total=3.26s audio=4.24s rtf=0.77
+2026-10-12 19:47:10,805 INFO vieneu_lite.api: b74f52121ecc41da8eaef267cb96755c ttfa=324ms total=3.27s audio=4.32s rtf=0.76
+2026-10-12 19:47:10,806 INFO vieneu_lite.api: 24abbc1ad90a45eb833863ad1e167e18 ttfa=320ms total=3.27s audio=4.32s rtf=0.76
+2026-10-12 19:47:10,808 INFO vieneu_lite.api: 312f26b54b0c4213a20774c87bbd5c3b ttfa=537ms total=3.27s audio=4.32s rtf=0.76
+2026-10-12 19:47:10,809 INFO vieneu_lite.api: 69a55fe1990648d19651adb66d2d6d77 ttfa=533ms total=3.27s audio=4.32s rtf=0.76
+2026-10-12 19:47:10,886 INFO vieneu_lite.api: 134e343e190c49f29fa2eaabf271b20b ttfa=536ms total=3.35s audio=4.40s rtf=0.76
+INFO:     127.0.0.1:33284 - "POST /benchmark/seed?seed=42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33354 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33316 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33314 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33332 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33346 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33352 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33398 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33380 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33298 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33364 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33294 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33400 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33388 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33286 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33290 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33412 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33414 - "GET /benchmark HTTP/1.1" 200 OK
+2026-10-12 19:47:13,765 INFO vieneu_lite.api: 2544ae15c89d4c42a3459ff9cebbe4fb ttfa=231ms total=2.84s audio=3.92s rtf=0.72
+2026-10-12 19:47:13,769 INFO vieneu_lite.api: dcbc3bf6fd2a4a2a837d1b6f136140ff ttfa=237ms total=2.85s audio=4.16s rtf=0.68
+2026-10-12 19:47:13,770 INFO vieneu_lite.api: 8c3aec980b6f4525945ca43ed2980303 ttfa=223ms total=2.83s audio=3.84s rtf=0.74
+2026-10-12 19:47:13,771 INFO vieneu_lite.api: fff0c93c44154ee78d2a235eb3ffba1b ttfa=222ms total=2.83s audio=3.92s rtf=0.72
+2026-10-12 19:47:13,773 INFO vieneu_lite.api: 98b606fd6180473e8b2b6563d1434bb3 ttfa=231ms total=2.85s audio=3.92s rtf=0.73
+2026-10-12 19:47:13,774 INFO vieneu_lite.api: db971036090f446d852d5923a4de2b87 ttfa=231ms total=2.85s audio=4.08s rtf=0.70
+2026-10-12 19:47:13,775 INFO vieneu_lite.api: 8a84257934654f24b385855bb009f2df ttfa=395ms total=2.83s audio=4.00s rtf=0.71
+2026-10-12 19:47:13,776 INFO vieneu_lite.api: 929b6bcdfc38471aab52216e61a62b0c ttfa=221ms total=2.84s audio=4.00s rtf=0.71
+2026-10-12 19:47:14,016 INFO vieneu_lite.api: a82b6f7fecd34feb80d4e1cc7d71310d ttfa=240ms total=3.10s audio=4.16s rtf=0.74
+2026-10-12 19:47:14,018 INFO vieneu_lite.api: 5deb2f9f2a314c4f93851b45687d55b2 ttfa=403ms total=3.09s audio=4.24s rtf=0.73
+2026-10-12 19:47:14,019 INFO vieneu_lite.api: c8d965bb20ce4f448728c107d3a6a615 ttfa=397ms total=3.08s audio=4.16s rtf=0.74
+2026-10-12 19:47:14,020 INFO vieneu_lite.api: f50ede4eb3064e75ba18ccd73b35c78f ttfa=222ms total=3.08s audio=4.32s rtf=0.71
+2026-10-12 19:47:14,021 INFO vieneu_lite.api: e2ac046f6ab04697983eb405bec2fb0c ttfa=396ms total=3.08s audio=4.08s rtf=0.76
+2026-10-12 19:47:14,022 INFO vieneu_lite.api: 610541277d484d00b2c3233a88cabeb3 ttfa=396ms total=3.08s audio=4.08s rtf=0.76
+2026-10-12 19:47:14,023 INFO vieneu_lite.api: 43fc0ab082a042ae908fe17120064991 ttfa=398ms total=3.09s audio=4.24s rtf=0.73
+2026-10-12 19:47:14,098 INFO vieneu_lite.api: df36a00ef7434d62939d614344191c31 ttfa=394ms total=3.16s audio=4.40s rtf=0.72
+INFO:     127.0.0.1:33416 - "POST /benchmark/seed?seed=42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33490 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33482 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33530 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33452 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33514 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33480 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33518 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33428 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33496 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33542 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33536 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33506 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33464 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33562 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33546 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33438 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33574 - "GET /benchmark HTTP/1.1" 200 OK
+2026-10-12 19:47:16,931 INFO vieneu_lite.api: 32bf103f52f847fea4f4516ba91a73c4 ttfa=209ms total=2.80s audio=3.92s rtf=0.71
+2026-10-12 19:47:16,935 INFO vieneu_lite.api: 002c63d9b0cc4536901d031c8ba49f54 ttfa=206ms total=2.80s audio=3.92s rtf=0.71
+2026-10-12 19:47:16,936 INFO vieneu_lite.api: 27fe034f31914bc8a523bdfc85f35a2e ttfa=204ms total=2.80s audio=3.92s rtf=0.71
+2026-10-12 19:47:16,938 INFO vieneu_lite.api: 4db5a2a386764a0288f9764415a58beb ttfa=375ms total=2.80s audio=3.92s rtf=0.71
+2026-10-12 19:47:16,939 INFO vieneu_lite.api: 0a928ea865614817ae6f023eea58274e ttfa=370ms total=2.79s audio=3.92s rtf=0.71
+INFO:     127.0.0.1:33580 - "GET /benchmark HTTP/1.1" 200 OK
+2026-10-12 19:47:17,213 INFO vieneu_lite.api: 4056ee7f08e14a788c379b5112e17266 ttfa=217ms total=3.09s audio=4.24s rtf=0.73
+2026-10-12 19:47:17,218 INFO vieneu_lite.api: 262c7b8d1aaa4e2492ec2d2c05c68879 ttfa=200ms total=3.07s audio=4.32s rtf=0.71
+2026-10-12 19:47:17,219 INFO vieneu_lite.api: 443269bfd11b4e30a2f2546082fae582 ttfa=374ms total=3.07s audio=4.08s rtf=0.75
+2026-10-12 19:47:17,220 INFO vieneu_lite.api: 2e8d8d302543487e9fbd09356b4df658 ttfa=216ms total=3.09s audio=4.32s rtf=0.72
+2026-10-12 19:47:17,221 INFO vieneu_lite.api: f1706d68daf743cf9b442076ea1abf69 ttfa=203ms total=3.08s audio=4.24s rtf=0.73
+2026-10-12 19:47:17,223 INFO vieneu_lite.api: 08cdaaadb42a45bfb18286f575746809 ttfa=197ms total=3.08s audio=4.24s rtf=0.73
+2026-10-12 19:47:17,224 INFO vieneu_lite.api: 610369ee74104a6095e80db82ceb28b2 ttfa=199ms total=3.08s audio=4.16s rtf=0.74
+2026-10-12 19:47:17,225 INFO vieneu_lite.api: 311bff18acd64d2ab2323dad5caf7f47 ttfa=372ms total=3.08s audio=4.24s rtf=0.73
+2026-10-12 19:47:17,226 INFO vieneu_lite.api: 7d87b177629446b59eb009e5b9ab7b0e ttfa=377ms total=3.08s audio=4.08s rtf=0.76
+2026-10-12 19:47:17,227 INFO vieneu_lite.api: 0bb009657e2f45e0b2084cbbcd58937c ttfa=208ms total=3.09s audio=4.24s rtf=0.73
+2026-10-12 19:47:17,298 INFO vieneu_lite.api: 50c5270c8606467eab510add6bfc465c ttfa=370ms total=3.15s audio=4.40s rtf=0.72
+INFO:     127.0.0.1:56586 - "GET /benchmark HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56596 - "GET /results/bench-16.log HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56612 - "GET /results/bench-16.jsonl HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56628 - "GET /results/bench-16.gpu.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56634 - "GET /results/server-requests.jsonl HTTP/1.1" 200 OK
+✓ disconnected · App and GPU are still running; billing continues
+  Reconnect: vkong attach vk_8ea7a305851f137e
+  Stop App and billing: vkong app stop vieneu-original-baseline

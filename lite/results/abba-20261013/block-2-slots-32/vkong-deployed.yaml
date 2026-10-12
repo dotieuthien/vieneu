@@ -1,0 +1,15 @@
+type: service
+app: vieneu-original-baseline
+app_port: 8000
+
+gpu: RTX 3060
+num_gpus: 1
+cpu_cores: 4
+ram_gb: 16
+disk_gb: 40
+max_dph: 0.35
+verified_only: true
+
+image: pytorch/pytorch:2.8.0-cuda12.8-cudnn9-runtime
+# WATERMARK=0 to match the baseline benchmark (baseline passes apply_watermark=False).
+start: env BENCH_MODE=1 MAX_STREAMS=32 WATERMARK=0 OMP_NUM_THREADS=4 python -u serve.py

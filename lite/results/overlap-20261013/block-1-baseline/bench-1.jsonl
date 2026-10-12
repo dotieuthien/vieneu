@@ -1,0 +1,3 @@
+{"request_id": "fefaaed904a04096ad10ee2bfa3f6e5b", "concurrency": 1, "repeat": 1, "index": 0, "seed": 42, "ttfa_s": 0.13792787998681888, "total_s": 2.234595457004616, "audio_s": 4.08, "rtf": 0.5476949649521118, "ok": true}
+{"request_id": "131e6817325d42ee8b99fd9aef6e34eb", "concurrency": 1, "repeat": 2, "index": 0, "seed": 43, "ttfa_s": 0.13214605397661217, "total_s": 2.0639800039934926, "audio_s": 3.84, "rtf": 0.5374947927066387, "ok": true}
+{"request_id": "fa0b78e07bfb42a5945fa0b72f380efd", "concurrency": 1, "repeat": 3, "index": 0, "seed": 44, "ttfa_s": 0.13080352297401987, "total_s": 2.1486470399831887, "audio_s": 4.08, "rtf": 0.5266291764664678, "ok": true}

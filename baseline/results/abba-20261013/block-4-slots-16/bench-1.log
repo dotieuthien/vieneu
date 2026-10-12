@@ -1,0 +1,19 @@
+benchmark_host=00e188f076e2 server_pid=4519 base=http://127.0.0.1:8000
+server: backend=pytorch max_streams=16 active=None
+warmup c=1 repeat=-1 ok=1 TTFA=149.3ms
+warmup c=1 repeat=0 ok=1 TTFA=125.6ms
+measured c=1 repeat=1 ok=1 TTFA=121.1ms
+measured c=1 repeat=2 ok=1 TTFA=118.8ms
+measured c=1 repeat=3 ok=1 TTFA=119.3ms
+measured c=1 repeat=4 ok=1 TTFA=118.2ms
+measured c=1 repeat=5 ok=1 TTFA=120.8ms
+measured c=1 repeat=6 ok=1 TTFA=120.3ms
+measured c=1 repeat=7 ok=1 TTFA=120.3ms
+measured c=1 repeat=8 ok=1 TTFA=117.5ms
+measured c=1 repeat=9 ok=1 TTFA=116.8ms
+measured c=1 repeat=10 ok=1 TTFA=116.7ms
+measured c=1 repeat=11 ok=1 TTFA=140.0ms
+measured c=1 repeat=12 ok=1 TTFA=130.4ms
+measured c=1 repeat=13 ok=1 TTFA=123.2ms
+measured c=1 repeat=14 ok=1 TTFA=125.9ms
+measured c=1 repeat=15 ok=1 TTFA=143.4ms

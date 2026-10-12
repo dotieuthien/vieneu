@@ -1,0 +1,5 @@
+.git/
+.venv/
+.vkong/
+__pycache__/
+results/

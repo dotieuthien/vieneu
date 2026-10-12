@@ -1,0 +1,677 @@
+{
+  "date_local": "2026-10-13",
+  "implementation": "baseline",
+  "requests_ok": 630,
+  "errors": 0,
+  "cases": {
+    "1": {
+      "n": 30,
+      "client_ttfa_p50_ms": 127.03517350018956,
+      "client_ttfa_p90_ms": 132.6170630956767,
+      "server_ttfa_p50_ms": 123.57848849205766,
+      "server_ttfa_p90_ms": 128.68456729629543,
+      "rtf_p50": 0.5294353196658481,
+      "rtf_p90": 0.5498574994026757,
+      "rtf_max": 0.5606043029390504,
+      "audio_s_min": 3.84,
+      "audio_s_max": 4.24,
+      "audio_s_p50": 4.08
+    },
+    "4": {
+      "n": 40,
+      "client_ttfa_p50_ms": 174.41789399890695,
+      "client_ttfa_p90_ms": 186.5166369912913,
+      "server_ttfa_p50_ms": 165.06169049534947,
+      "server_ttfa_p90_ms": 178.940897618304,
+      "rtf_p50": 0.5676993369022718,
+      "rtf_p90": 0.5994597962558147,
+      "rtf_max": 0.616387989721261,
+      "audio_s_min": 3.6,
+      "audio_s_max": 4.4,
+      "audio_s_p50": 4.08
+    },
+    "8": {
+      "n": 80,
+      "client_ttfa_p50_ms": 202.60172200505622,
+      "client_ttfa_p90_ms": 222.34382170718175,
+      "server_ttfa_p50_ms": 189.42409900773782,
+      "server_ttfa_p90_ms": 206.70345520484278,
+      "rtf_p50": 0.5910885252687876,
+      "rtf_p90": 0.6421020977894145,
+      "rtf_max": 0.6685107247458476,
+      "audio_s_min": 3.68,
+      "audio_s_max": 4.56,
+      "audio_s_p50": 4.08
+    },
+    "16": {
+      "n": 160,
+      "client_ttfa_p50_ms": 243.56703700323123,
+      "client_ttfa_p90_ms": 404.60245150025,
+      "server_ttfa_p50_ms": 223.2841009972617,
+      "server_ttfa_p90_ms": 376.3033900060691,
+      "rtf_p50": 0.6735591103188093,
+      "rtf_p90": 0.7009688632122281,
+      "rtf_max": 0.734277859575083,
+      "audio_s_min": 3.52,
+      "audio_s_max": 4.56,
+      "audio_s_p50": 4.08
+    },
+    "32": {
+      "n": 320,
+      "client_ttfa_p50_ms": 588.3638239902211,
+      "client_ttfa_p90_ms": 798.1539750093365,
+      "server_ttfa_p50_ms": 536.1893014924135,
+      "server_ttfa_p90_ms": 740.9469030040782,
+      "rtf_p50": 1.0398950833333918,
+      "rtf_p90": 1.1251031027630793,
+      "rtf_max": 1.1971906874969136,
+      "audio_s_min": 3.68,
+      "audio_s_max": 4.8,
+      "audio_s_p50": 4.08
+    }
+  },
+  "blocks": [
+    {
+      "block": 1,
+      "slots": 16,
+      "cases": {
+        "1": {
+          "n": 15,
+          "client_ttfa_p50_ms": 129.72232399624772,
+          "client_ttfa_p90_ms": 132.21184779540636,
+          "server_ttfa_p50_ms": 125.8031270117499,
+          "server_ttfa_p90_ms": 128.09711360023357,
+          "rtf_p50": 0.5333932270787045,
+          "rtf_p90": 0.5462763112998282,
+          "rtf_max": 0.5576296127401292,
+          "audio_s_min": 3.84,
+          "audio_s_max": 4.24,
+          "audio_s_p50": 4.08
+        },
+        "4": {
+          "n": 20,
+          "client_ttfa_p50_ms": 172.1633999986807,
+          "client_ttfa_p90_ms": 174.79205560230184,
+          "server_ttfa_p50_ms": 163.48660249786917,
+          "server_ttfa_p90_ms": 165.47961810429115,
+          "rtf_p50": 0.5539959290593075,
+          "rtf_p90": 0.5660402954365891,
+          "rtf_max": 0.579935032227594,
+          "audio_s_min": 3.6,
+          "audio_s_max": 4.4,
+          "audio_s_p50": 4.08
+        },
+        "8": {
+          "n": 40,
+          "client_ttfa_p50_ms": 202.19104349962436,
+          "client_ttfa_p90_ms": 218.3415703853825,
+          "server_ttfa_p50_ms": 188.4861614962574,
+          "server_ttfa_p90_ms": 201.32815379765816,
+          "rtf_p50": 0.5859472271291805,
+          "rtf_p90": 0.6028307639250986,
+          "rtf_max": 0.6107383216378646,
+          "audio_s_min": 3.68,
+          "audio_s_max": 4.56,
+          "audio_s_p50": 4.08
+        },
+        "16": {
+          "n": 80,
+          "client_ttfa_p50_ms": 254.66999800119083,
+          "client_ttfa_p90_ms": 406.94692430552095,
+          "server_ttfa_p50_ms": 225.11401648807805,
+          "server_ttfa_p90_ms": 378.5121093067574,
+          "rtf_p50": 0.6849941191422514,
+          "rtf_p90": 0.7053482316125567,
+          "rtf_max": 0.734277859575083,
+          "audio_s_min": 3.52,
+          "audio_s_max": 4.56,
+          "audio_s_p50": 4.08
+        }
+      }
+    },
+    {
+      "block": 1,
+      "slots": 32,
+      "cases": {
+        "32": {
+          "n": 160,
+          "client_ttfa_p50_ms": 652.2555630217539,
+          "client_ttfa_p90_ms": 876.3164185191272,
+          "server_ttfa_p50_ms": 606.5191944944672,
+          "server_ttfa_p90_ms": 831.4032865891932,
+          "rtf_p50": 1.0759089766843735,
+          "rtf_p90": 1.1480433049635312,
+          "rtf_max": 1.1971906874969136,
+          "audio_s_min": 3.68,
+          "audio_s_max": 4.56,
+          "audio_s_p50": 4.08
+        }
+      }
+    },
+    {
+      "block": 4,
+      "slots": 16,
+      "cases": {
+        "1": {
+          "n": 15,
+          "client_ttfa_p50_ms": 120.28075900161639,
+          "client_ttfa_p90_ms": 136.15942959440872,
+          "server_ttfa_p50_ms": 116.40934500610456,
+          "server_ttfa_p90_ms": 132.03150260378607,
+          "rtf_p50": 0.5120874854601796,
+          "rtf_p90": 0.5539545657657587,
+          "rtf_max": 0.5606043029390504,
+          "audio_s_min": 3.84,
+          "audio_s_max": 4.24,
+          "audio_s_p50": 4.08
+        },
+        "4": {
+          "n": 20,
+          "client_ttfa_p50_ms": 178.29294501279946,
+          "client_ttfa_p90_ms": 187.05324619659223,
+          "server_ttfa_p50_ms": 169.56187901087105,
+          "server_ttfa_p90_ms": 180.0182243954623,
+          "rtf_p50": 0.5849843515698369,
+          "rtf_p90": 0.6050866241162112,
+          "rtf_max": 0.616387989721261,
+          "audio_s_min": 3.6,
+          "audio_s_max": 4.4,
+          "audio_s_p50": 4.0
+        },
+        "8": {
+          "n": 40,
+          "client_ttfa_p50_ms": 203.43043649336323,
+          "client_ttfa_p90_ms": 238.52241200220305,
+          "server_ttfa_p50_ms": 189.68475550354924,
+          "server_ttfa_p90_ms": 225.2651078888448,
+          "rtf_p50": 0.6140735283184426,
+          "rtf_p90": 0.6504836288009895,
+          "rtf_max": 0.6685107247458476,
+          "audio_s_min": 3.76,
+          "audio_s_max": 4.56,
+          "audio_s_p50": 4.12
+        },
+        "16": {
+          "n": 80,
+          "client_ttfa_p50_ms": 235.69837149989326,
+          "client_ttfa_p90_ms": 390.37662050686777,
+          "server_ttfa_p50_ms": 216.4690860081464,
+          "server_ttfa_p90_ms": 364.56486909883097,
+          "rtf_p50": 0.663553519442952,
+          "rtf_p90": 0.6871448451204644,
+          "rtf_max": 0.7136273470606801,
+          "audio_s_min": 3.52,
+          "audio_s_max": 4.56,
+          "audio_s_p50": 4.08
+        }
+      }
+    },
+    {
+      "block": 4,
+      "slots": 32,
+      "cases": {
+        "32": {
+          "n": 160,
+          "client_ttfa_p50_ms": 578.2176359934965,
+          "client_ttfa_p90_ms": 785.361017312971,
+          "server_ttfa_p50_ms": 531.4551784977084,
+          "server_ttfa_p90_ms": 728.7164573906921,
+          "rtf_p50": 1.0187221748765296,
+          "rtf_p90": 1.0760221722648566,
+          "rtf_max": 1.130620149000606,
+          "audio_s_min": 3.68,
+          "audio_s_max": 4.8,
+          "audio_s_p50": 4.16
+        }
+      }
+    }
+  ],
+  "hostname": "00e188f076e2",
+  "gpu_uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+  "source_sha256": {
+    "benchmark.py": "de15ee8171f948426bb7b04211b1705246334367abe3c3b2b5f91c84e9e08fc3",
+    "serve.py": "dc0b03f5c567f2972ae8a40851e1b2fe2270578860e2e304ff9afe2756516777",
+    "bench_support.py": "baad6d597af94acd9dc617752b3cd093ece88eab967ae1039bb8b6401d98f530",
+    "requirements.txt": "1c312ab97c01d5c0057092642d930be36e30a661d2bf164e61f0e83ad59dd419"
+  },
+  "rental": {
+    "id": "vk_7fba8887e3fa2c37",
+    "hourly_usd": 0.077778,
+    "released": true
+  },
+  "method": {
+    "order": [
+      "baseline",
+      "lite",
+      "lite",
+      "baseline"
+    ],
+    "slots": {
+      "1": 16,
+      "4": 16,
+      "8": 16,
+      "16": 16,
+      "32": 32
+    },
+    "measured_repetitions_per_block": {
+      "1": 15,
+      "4": 5,
+      "8": 5,
+      "16": 5,
+      "32": 5
+    },
+    "warmup_bursts_per_case": 2,
+    "seed": "42 + repetition index, reset before each burst; scheduling can still change generated audio",
+    "gpu_idle": "<=5% utilization for 5 consecutive samples before model load and before each concurrency case",
+    "clock_target_mhz": 1500,
+    "percentile": "linear interpolation at (n-1)*p over individual requests; no median of medians",
+    "benchmark": "Instrumented upstream PCM client, adding per-request JSONL, barrier, seed and repetitions",
+    "client_location": "same container HTTP loopback http://127.0.0.1:8000",
+    "server_ttfa": "speech handler after validation to first float audio chunk; includes scheduler/preparation, excludes PCM conversion/socket",
+    "comparison": "descriptive ABBA; two deployment blocks per implementation, not a statistical equivalence test"
+  },
+  "gpu": {
+    "preflights": [
+      {
+        "before_load": [
+          {
+            "timestamp": "2026/10/12 19:06:22.765",
+            "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+            "name": "NVIDIA GeForce RTX 3060",
+            "driver_version": "595.104.02",
+            "pstate": "P8",
+            "utilization.gpu": "0",
+            "memory.used": "1",
+            "power.draw": "20.33",
+            "power.limit": "120.00",
+            "temperature.gpu": "53",
+            "clocks.current.graphics": "210",
+            "clocks.current.memory": "405"
+          },
+          {
+            "timestamp": "2026/10/12 19:06:23.819",
+            "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+            "name": "NVIDIA GeForce RTX 3060",
+            "driver_version": "595.104.02",
+            "pstate": "P8",
+            "utilization.gpu": "0",
+            "memory.used": "1",
+            "power.draw": "20.33",
+            "power.limit": "120.00",
+            "temperature.gpu": "53",
+            "clocks.current.graphics": "210",
+            "clocks.current.memory": "405"
+          },
+          {
+            "timestamp": "2026/10/12 19:06:24.869",
+            "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+            "name": "NVIDIA GeForce RTX 3060",
+            "driver_version": "595.104.02",
+            "pstate": "P8",
+            "utilization.gpu": "0",
+            "memory.used": "1",
+            "power.draw": "20.33",
+            "power.limit": "120.00",
+            "temperature.gpu": "53",
+            "clocks.current.graphics": "210",
+            "clocks.current.memory": "405"
+          },
+          {
+            "timestamp": "2026/10/12 19:06:25.925",
+            "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+            "name": "NVIDIA GeForce RTX 3060",
+            "driver_version": "595.104.02",
+            "pstate": "P8",
+            "utilization.gpu": "0",
+            "memory.used": "1",
+            "power.draw": "20.33",
+            "power.limit": "120.00",
+            "temperature.gpu": "53",
+            "clocks.current.graphics": "210",
+            "clocks.current.memory": "405"
+          },
+          {
+            "timestamp": "2026/10/12 19:06:26.980",
+            "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+            "name": "NVIDIA GeForce RTX 3060",
+            "driver_version": "595.104.02",
+            "pstate": "P8",
+            "utilization.gpu": "0",
+            "memory.used": "1",
+            "power.draw": "20.33",
+            "power.limit": "120.00",
+            "temperature.gpu": "53",
+            "clocks.current.graphics": "210",
+            "clocks.current.memory": "405"
+          }
+        ],
+        "idle_pass": true,
+        "clock_lock": {
+          "requested_mhz": 1500,
+          "returncode": 4,
+          "stdout": "The current user does not have permission to change clocks for GPU 00000000:0E:00.0.\nTerminating early due to previous errors.\n",
+          "stderr": ""
+        },
+        "after_lock": {
+          "timestamp": "2026/10/12 19:06:27.079",
+          "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+          "name": "NVIDIA GeForce RTX 3060",
+          "driver_version": "595.104.02",
+          "pstate": "P8",
+          "utilization.gpu": "0",
+          "memory.used": "1",
+          "power.draw": "20.33",
+          "power.limit": "120.00",
+          "temperature.gpu": "53",
+          "clocks.current.graphics": "210",
+          "clocks.current.memory": "405"
+        }
+      },
+      {
+        "before_load": [
+          {
+            "timestamp": "2026/10/12 19:09:13.012",
+            "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+            "name": "NVIDIA GeForce RTX 3060",
+            "driver_version": "595.104.02",
+            "pstate": "P8",
+            "utilization.gpu": "0",
+            "memory.used": "1",
+            "power.draw": "21.18",
+            "power.limit": "120.00",
+            "temperature.gpu": "54",
+            "clocks.current.graphics": "210",
+            "clocks.current.memory": "405"
+          },
+          {
+            "timestamp": "2026/10/12 19:09:14.103",
+            "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+            "name": "NVIDIA GeForce RTX 3060",
+            "driver_version": "595.104.02",
+            "pstate": "P8",
+            "utilization.gpu": "0",
+            "memory.used": "1",
+            "power.draw": "21.02",
+            "power.limit": "120.00",
+            "temperature.gpu": "53",
+            "clocks.current.graphics": "210",
+            "clocks.current.memory": "405"
+          },
+          {
+            "timestamp": "2026/10/12 19:09:15.191",
+            "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+            "name": "NVIDIA GeForce RTX 3060",
+            "driver_version": "595.104.02",
+            "pstate": "P8",
+            "utilization.gpu": "0",
+            "memory.used": "1",
+            "power.draw": "20.99",
+            "power.limit": "120.00",
+            "temperature.gpu": "53",
+            "clocks.current.graphics": "210",
+            "clocks.current.memory": "405"
+          },
+          {
+            "timestamp": "2026/10/12 19:09:16.251",
+            "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+            "name": "NVIDIA GeForce RTX 3060",
+            "driver_version": "595.104.02",
+            "pstate": "P8",
+            "utilization.gpu": "0",
+            "memory.used": "1",
+            "power.draw": "20.92",
+            "power.limit": "120.00",
+            "temperature.gpu": "53",
+            "clocks.current.graphics": "210",
+            "clocks.current.memory": "405"
+          },
+          {
+            "timestamp": "2026/10/12 19:09:17.314",
+            "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+            "name": "NVIDIA GeForce RTX 3060",
+            "driver_version": "595.104.02",
+            "pstate": "P8",
+            "utilization.gpu": "0",
+            "memory.used": "1",
+            "power.draw": "20.88",
+            "power.limit": "120.00",
+            "temperature.gpu": "53",
+            "clocks.current.graphics": "210",
+            "clocks.current.memory": "405"
+          }
+        ],
+        "idle_pass": true,
+        "clock_lock": {
+          "requested_mhz": 1500,
+          "returncode": 4,
+          "stdout": "The current user does not have permission to change clocks for GPU 00000000:0E:00.0.\nTerminating early due to previous errors.\n",
+          "stderr": ""
+        },
+        "after_lock": {
+          "timestamp": "2026/10/12 19:09:17.382",
+          "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+          "name": "NVIDIA GeForce RTX 3060",
+          "driver_version": "595.104.02",
+          "pstate": "P8",
+          "utilization.gpu": "0",
+          "memory.used": "1",
+          "power.draw": "20.88",
+          "power.limit": "120.00",
+          "temperature.gpu": "53",
+          "clocks.current.graphics": "210",
+          "clocks.current.memory": "405"
+        }
+      },
+      {
+        "before_load": [
+          {
+            "timestamp": "2026/10/12 19:18:52.957",
+            "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+            "name": "NVIDIA GeForce RTX 3060",
+            "driver_version": "595.104.02",
+            "pstate": "P8",
+            "utilization.gpu": "0",
+            "memory.used": "1",
+            "power.draw": "21.43",
+            "power.limit": "120.00",
+            "temperature.gpu": "54",
+            "clocks.current.graphics": "277",
+            "clocks.current.memory": "405"
+          },
+          {
+            "timestamp": "2026/10/12 19:18:54.032",
+            "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+            "name": "NVIDIA GeForce RTX 3060",
+            "driver_version": "595.104.02",
+            "pstate": "P8",
+            "utilization.gpu": "0",
+            "memory.used": "1",
+            "power.draw": "21.13",
+            "power.limit": "120.00",
+            "temperature.gpu": "53",
+            "clocks.current.graphics": "210",
+            "clocks.current.memory": "405"
+          },
+          {
+            "timestamp": "2026/10/12 19:18:55.103",
+            "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+            "name": "NVIDIA GeForce RTX 3060",
+            "driver_version": "595.104.02",
+            "pstate": "P8",
+            "utilization.gpu": "0",
+            "memory.used": "1",
+            "power.draw": "21.07",
+            "power.limit": "120.00",
+            "temperature.gpu": "53",
+            "clocks.current.graphics": "210",
+            "clocks.current.memory": "405"
+          },
+          {
+            "timestamp": "2026/10/12 19:18:56.194",
+            "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+            "name": "NVIDIA GeForce RTX 3060",
+            "driver_version": "595.104.02",
+            "pstate": "P8",
+            "utilization.gpu": "0",
+            "memory.used": "1",
+            "power.draw": "21.02",
+            "power.limit": "120.00",
+            "temperature.gpu": "53",
+            "clocks.current.graphics": "210",
+            "clocks.current.memory": "405"
+          },
+          {
+            "timestamp": "2026/10/12 19:18:57.248",
+            "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+            "name": "NVIDIA GeForce RTX 3060",
+            "driver_version": "595.104.02",
+            "pstate": "P8",
+            "utilization.gpu": "0",
+            "memory.used": "1",
+            "power.draw": "20.97",
+            "power.limit": "120.00",
+            "temperature.gpu": "52",
+            "clocks.current.graphics": "210",
+            "clocks.current.memory": "405"
+          }
+        ],
+        "idle_pass": true,
+        "clock_lock": {
+          "requested_mhz": 1500,
+          "returncode": 4,
+          "stdout": "The current user does not have permission to change clocks for GPU 00000000:0E:00.0.\nTerminating early due to previous errors.\n",
+          "stderr": ""
+        },
+        "after_lock": {
+          "timestamp": "2026/10/12 19:18:57.324",
+          "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+          "name": "NVIDIA GeForce RTX 3060",
+          "driver_version": "595.104.02",
+          "pstate": "P8",
+          "utilization.gpu": "0",
+          "memory.used": "1",
+          "power.draw": "20.97",
+          "power.limit": "120.00",
+          "temperature.gpu": "52",
+          "clocks.current.graphics": "210",
+          "clocks.current.memory": "405"
+        }
+      },
+      {
+        "before_load": [
+          {
+            "timestamp": "2026/10/12 19:21:37.431",
+            "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+            "name": "NVIDIA GeForce RTX 3060",
+            "driver_version": "595.104.02",
+            "pstate": "P8",
+            "utilization.gpu": "0",
+            "memory.used": "1",
+            "power.draw": "21.27",
+            "power.limit": "120.00",
+            "temperature.gpu": "54",
+            "clocks.current.graphics": "210",
+            "clocks.current.memory": "405"
+          },
+          {
+            "timestamp": "2026/10/12 19:21:38.524",
+            "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+            "name": "NVIDIA GeForce RTX 3060",
+            "driver_version": "595.104.02",
+            "pstate": "P8",
+            "utilization.gpu": "0",
+            "memory.used": "1",
+            "power.draw": "21.02",
+            "power.limit": "120.00",
+            "temperature.gpu": "53",
+            "clocks.current.graphics": "210",
+            "clocks.current.memory": "405"
+          },
+          {
+            "timestamp": "2026/10/12 19:21:39.578",
+            "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+            "name": "NVIDIA GeForce RTX 3060",
+            "driver_version": "595.104.02",
+            "pstate": "P8",
+            "utilization.gpu": "0",
+            "memory.used": "1",
+            "power.draw": "20.98",
+            "power.limit": "120.00",
+            "temperature.gpu": "53",
+            "clocks.current.graphics": "210",
+            "clocks.current.memory": "405"
+          },
+          {
+            "timestamp": "2026/10/12 19:21:40.627",
+            "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+            "name": "NVIDIA GeForce RTX 3060",
+            "driver_version": "595.104.02",
+            "pstate": "P8",
+            "utilization.gpu": "0",
+            "memory.used": "1",
+            "power.draw": "20.97",
+            "power.limit": "120.00",
+            "temperature.gpu": "52",
+            "clocks.current.graphics": "210",
+            "clocks.current.memory": "405"
+          },
+          {
+            "timestamp": "2026/10/12 19:21:41.681",
+            "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+            "name": "NVIDIA GeForce RTX 3060",
+            "driver_version": "595.104.02",
+            "pstate": "P8",
+            "utilization.gpu": "0",
+            "memory.used": "1",
+            "power.draw": "20.94",
+            "power.limit": "120.00",
+            "temperature.gpu": "52",
+            "clocks.current.graphics": "210",
+            "clocks.current.memory": "405"
+          }
+        ],
+        "idle_pass": true,
+        "clock_lock": {
+          "requested_mhz": 1500,
+          "returncode": 4,
+          "stdout": "The current user does not have permission to change clocks for GPU 00000000:0E:00.0.\nTerminating early due to previous errors.\n",
+          "stderr": ""
+        },
+        "after_lock": {
+          "timestamp": "2026/10/12 19:21:41.782",
+          "uuid": "GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919",
+          "name": "NVIDIA GeForce RTX 3060",
+          "driver_version": "595.104.02",
+          "pstate": "P8",
+          "utilization.gpu": "0",
+          "memory.used": "1",
+          "power.draw": "20.94",
+          "power.limit": "120.00",
+          "temperature.gpu": "52",
+          "clocks.current.graphics": "210",
+          "clocks.current.memory": "405"
+        }
+      }
+    ],
+    "driver_versions": [
+      "595.104.02"
+    ],
+    "power_limits_w": [
+      120.0
+    ],
+    "graphics_clock_range_mhz": [
+      1777.0,
+      1935.0
+    ],
+    "temperature_range_c": [
+      54.0,
+      71.0
+    ],
+    "active_graphics_clock_range_mhz": [
+      1777.0,
+      1935.0
+    ],
+    "clock_locked": false
+  },
+  "interpretation": "No consistent slowdown across all concurrency levels. At c16 pooled lite TTFA is higher, but block medians vary substantially and change ordering relative to baseline. No equivalence or code-causality conclusion; clock locking denied."
+}

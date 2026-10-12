@@ -1,0 +1,300 @@
+{
+  "measured_date_local": "2026-10-13",
+  "report_generated_at": "2026-10-12T18:36:43.117378+00:00",
+  "runtime": {
+    "status": "ok",
+    "backend": "pytorch",
+    "gpu": "NVIDIA GeForce RTX 3060",
+    "sample_rate": 48000,
+    "max_streams": 16,
+    "decode_frames": 4,
+    "leadin_frames": 2,
+    "watermark": false,
+    "cuda": "12.8",
+    "versions": {
+      "vieneu": "3.8.3",
+      "torch": "2.8.0+cu128",
+      "torchaudio": "2.8.0+cu128",
+      "transformers": "4.57.6",
+      "sea-g2p": "0.10.0"
+    }
+  },
+  "method": {
+    "client": "unchanged upstream examples/openai_speech_client.py --bench N",
+    "location": "benchmark subprocess in server container, explicit HTTP loopback http://127.0.0.1:8000",
+    "repetitions": 3,
+    "order": [
+      32,
+      1,
+      4,
+      8,
+      16
+    ],
+    "voice": "SDK default preset (voice=None)",
+    "text": "Xin chào, đây là giọng đọc VieNeu phát trực tiếp qua API chuẩn OpenAI.",
+    "admission": "16 simultaneous SDK infer_stream calls; excess HTTP requests wait",
+    "sampling": "SDK defaults; no fixed seed",
+    "warmup": "one short SDK request at server startup",
+    "clock_lock": false,
+    "p99_measured": false,
+    "underrun_measured": false,
+    "implementation_order": [
+      "baseline",
+      "lite"
+    ],
+    "same_machine": true,
+    "hostname": "c5553ff94ac0",
+    "server_pids": [
+      202
+    ]
+  },
+  "cases": [
+    {
+      "concurrency": 1,
+      "runs": [
+        {
+          "repeat": 1,
+          "requests": 1,
+          "ok": 1,
+          "errors": 0,
+          "ttfa_median_ms": 134,
+          "ttfa_max_ms": 134,
+          "rtf_max": 0.55,
+          "wall_s": 2.1,
+          "log": "rerun-20261013/bench-c1-r1.log"
+        },
+        {
+          "repeat": 2,
+          "requests": 1,
+          "ok": 1,
+          "errors": 0,
+          "ttfa_median_ms": 132,
+          "ttfa_max_ms": 132,
+          "rtf_max": 0.55,
+          "wall_s": 2.4,
+          "log": "rerun-20261013/bench-c1-r2.log"
+        },
+        {
+          "repeat": 3,
+          "requests": 1,
+          "ok": 1,
+          "errors": 0,
+          "ttfa_median_ms": 135,
+          "ttfa_max_ms": 135,
+          "rtf_max": 0.53,
+          "wall_s": 2.3,
+          "log": "rerun-20261013/bench-c1-r3.log"
+        }
+      ],
+      "ttfa_median_range_ms": [
+        132,
+        135
+      ],
+      "median_of_medians_ms": 134,
+      "ttfa_worst_ms": 135,
+      "rtf_worst": 0.55
+    },
+    {
+      "concurrency": 4,
+      "runs": [
+        {
+          "repeat": 1,
+          "requests": 4,
+          "ok": 4,
+          "errors": 0,
+          "ttfa_median_ms": 187,
+          "ttfa_max_ms": 191,
+          "rtf_max": 0.59,
+          "wall_s": 2.5,
+          "log": "rerun-20261013/bench-c4-r1.log"
+        },
+        {
+          "repeat": 2,
+          "requests": 4,
+          "ok": 4,
+          "errors": 0,
+          "ttfa_median_ms": 179,
+          "ttfa_max_ms": 181,
+          "rtf_max": 0.57,
+          "wall_s": 2.2,
+          "log": "rerun-20261013/bench-c4-r2.log"
+        },
+        {
+          "repeat": 3,
+          "requests": 4,
+          "ok": 4,
+          "errors": 0,
+          "ttfa_median_ms": 160,
+          "ttfa_max_ms": 164,
+          "rtf_max": 0.56,
+          "wall_s": 2.4,
+          "log": "rerun-20261013/bench-c4-r3.log"
+        }
+      ],
+      "ttfa_median_range_ms": [
+        160,
+        187
+      ],
+      "median_of_medians_ms": 179,
+      "ttfa_worst_ms": 191,
+      "rtf_worst": 0.59
+    },
+    {
+      "concurrency": 8,
+      "runs": [
+        {
+          "repeat": 1,
+          "requests": 8,
+          "ok": 8,
+          "errors": 0,
+          "ttfa_median_ms": 236,
+          "ttfa_max_ms": 244,
+          "rtf_max": 0.63,
+          "wall_s": 2.7,
+          "log": "rerun-20261013/bench-c8-r1.log"
+        },
+        {
+          "repeat": 2,
+          "requests": 8,
+          "ok": 8,
+          "errors": 0,
+          "ttfa_median_ms": 214,
+          "ttfa_max_ms": 224,
+          "rtf_max": 0.6,
+          "wall_s": 2.5,
+          "log": "rerun-20261013/bench-c8-r2.log"
+        },
+        {
+          "repeat": 3,
+          "requests": 8,
+          "ok": 8,
+          "errors": 0,
+          "ttfa_median_ms": 208,
+          "ttfa_max_ms": 218,
+          "rtf_max": 0.62,
+          "wall_s": 2.6,
+          "log": "rerun-20261013/bench-c8-r3.log"
+        }
+      ],
+      "ttfa_median_range_ms": [
+        208,
+        236
+      ],
+      "median_of_medians_ms": 214,
+      "ttfa_worst_ms": 244,
+      "rtf_worst": 0.63
+    },
+    {
+      "concurrency": 16,
+      "runs": [
+        {
+          "repeat": 1,
+          "requests": 16,
+          "ok": 16,
+          "errors": 0,
+          "ttfa_median_ms": 266,
+          "ttfa_max_ms": 402,
+          "rtf_max": 0.68,
+          "wall_s": 3.1,
+          "log": "rerun-20261013/bench-c16-r1.log"
+        },
+        {
+          "repeat": 2,
+          "requests": 16,
+          "ok": 16,
+          "errors": 0,
+          "ttfa_median_ms": 248,
+          "ttfa_max_ms": 392,
+          "rtf_max": 0.71,
+          "wall_s": 3.1,
+          "log": "rerun-20261013/bench-c16-r2.log"
+        },
+        {
+          "repeat": 3,
+          "requests": 16,
+          "ok": 16,
+          "errors": 0,
+          "ttfa_median_ms": 265,
+          "ttfa_max_ms": 416,
+          "rtf_max": 0.69,
+          "wall_s": 2.9,
+          "log": "rerun-20261013/bench-c16-r3.log"
+        }
+      ],
+      "ttfa_median_range_ms": [
+        248,
+        266
+      ],
+      "median_of_medians_ms": 265,
+      "ttfa_worst_ms": 416,
+      "rtf_worst": 0.71
+    },
+    {
+      "concurrency": 32,
+      "runs": [
+        {
+          "repeat": 1,
+          "requests": 32,
+          "ok": 32,
+          "errors": 0,
+          "ttfa_median_ms": 1683,
+          "ttfa_max_ms": 3449,
+          "rtf_max": 1.48,
+          "wall_s": 5.8,
+          "log": "rerun-20261013/bench-c32-r1.log"
+        },
+        {
+          "repeat": 2,
+          "requests": 32,
+          "ok": 32,
+          "errors": 0,
+          "ttfa_median_ms": 1706,
+          "ttfa_max_ms": 3182,
+          "rtf_max": 1.41,
+          "wall_s": 5.7,
+          "log": "rerun-20261013/bench-c32-r2.log"
+        },
+        {
+          "repeat": 3,
+          "requests": 32,
+          "ok": 32,
+          "errors": 0,
+          "ttfa_median_ms": 1460,
+          "ttfa_max_ms": 3226,
+          "rtf_max": 1.41,
+          "wall_s": 5.8,
+          "log": "rerun-20261013/bench-c32-r3.log"
+        }
+      ],
+      "ttfa_median_range_ms": [
+        1460,
+        1706
+      ],
+      "median_of_medians_ms": 1683,
+      "ttfa_worst_ms": 3449,
+      "rtf_worst": 1.48
+    }
+  ],
+  "requests_ok": 183,
+  "source_sha256": {
+    "serve.py": "49dd2cc249aacb035b65d6802480dad9d767e846c35b79a5c7ad94dabc338256",
+    "benchmark.py": "f2e1edf08fc3c2fea9c203c7ed4416a881d55d359bec751e005866872782abfb",
+    "requirements.txt": "1c312ab97c01d5c0057092642d930be36e30a661d2bf164e61f0e83ad59dd419",
+    "vkong.yaml": "ed36a00d5b17b1435f5030b80cf498e0c507115714681017bb970fa9f86d46bd"
+  },
+  "rental": {
+    "id": "vk_8cdb400eca7bc18b",
+    "hourly_usd": 0.064445,
+    "released": true
+  },
+  "comparison": {
+    "same_machine": true,
+    "same_container": true,
+    "hostname": "c5553ff94ac0",
+    "limitations": [
+      "Sequential baseline then lite; no order reversal or GPU clock lock.",
+      "Short fixed-text bursts; no p99, underrun, sustained load or audio-quality evaluation.",
+      "GPU startup snapshot before lite model load showed 99% utilization with 129 MiB VRAM; GPU isolation not established."
+    ]
+  }
+}

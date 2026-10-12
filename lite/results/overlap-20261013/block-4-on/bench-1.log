@@ -1,0 +1,7 @@
+benchmark_host=bb8ac1588446 server_pid=1361 base=http://127.0.0.1:8000
+server: backend=pytorch-lite max_streams=16 active=0
+warmup c=1 repeat=-1 ok=1 TTFA=192.1ms
+warmup c=1 repeat=0 ok=1 TTFA=148.6ms
+measured c=1 repeat=1 ok=1 TTFA=150.3ms
+measured c=1 repeat=2 ok=1 TTFA=146.7ms
+measured c=1 repeat=3 ok=1 TTFA=156.8ms

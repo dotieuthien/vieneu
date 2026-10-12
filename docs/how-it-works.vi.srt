@@ -1,0 +1,56 @@
+1
+00:00:00,000 --> 00:00:04,610
+Video này giải thích cách VieNeu biến chữ thành giọng nói và phát ngay cho người nghe.
+
+2
+00:00:05,210 --> 00:00:10,300
+Thay vì đợi tạo xong cả đoạn, VieNeu tạo giọng nói từng mẩu nhỏ, mẩu nào xong là gửi ngay.
+
+3
+00:00:10,900 --> 00:00:14,550
+Bước một: chữ viết được đổi thành cách phát âm, gọi là phoneme.
+
+4
+00:00:15,150 --> 00:00:21,760
+Bước hai: model tạo âm thanh từng mẩu 80 mili giây. Mẩu sau dựa trên các mẩu trước, gọi là tự hồi quy, hay AR.
+
+5
+00:00:21,760 --> 00:00:27,170
+Mỗi mẩu là 16 con số, điền lần lượt từng số. Đây là bản nén của âm thanh, chưa phải tiếng.
+
+6
+00:00:27,770 --> 00:00:33,900
+Mỗi mẩu cần hàng trăm phép tính nhỏ. Python phải ra lệnh cho GPU từng phép một, nên GPU chủ yếu đứng chờ.
+
+7
+00:00:33,900 --> 00:00:37,550
+Vì vậy, mỗi mẩu mất khoảng 55 đến 65 mili giây.
+
+8
+00:00:38,150 --> 00:00:44,280
+CUDA graph ghi lại toàn bộ chuỗi lệnh của một mẩu, chỉ một lần. Sau đó, mỗi mẩu chỉ cần một lệnh phát lại.
+
+9
+00:00:44,280 --> 00:00:49,690
+Theo tác giả, mỗi mẩu còn khoảng 7 đến 10 mili giây. Đổi lại, số ghế và bộ nhớ phải cố định.
+
+10
+00:00:50,290 --> 00:00:55,220
+Server có 16 ghế. Mỗi lần phát lại tạo một mẩu cho cả 16 người cùng lúc.
+
+11
+00:00:55,220 --> 00:00:58,070
+Ai xong thì nhường ghế, người đang chờ vào ngay.
+
+12
+00:00:58,670 --> 00:01:05,440
+Bước ba: codec đổi các con số thành âm thanh. Mỗi lần gọi codec khá tốn, nên server gom 4 mẩu rồi mới gọi.
+
+13
+00:01:05,440 --> 00:01:09,250
+Người mới vào được gọi sớm sau 2 mẩu, để nghe được tiếng đầu nhanh hơn.
+
+14
+00:01:09,850 --> 00:01:16,860
+Tóm lại: chữ thành cách đọc, tạo từng mẩu bằng CUDA graph, nhiều người dùng chung, rồi codec đổi thành âm thanh và gửi đi ngay.
+
