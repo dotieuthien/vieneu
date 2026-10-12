@@ -87,7 +87,7 @@ vkong app stop vieneu-serving-lite   # bản baseline: vkong app stop vieneu-ori
 
 ![Biểu đồ GPU, CPU và RAM của máy](docs/metrics.png)
 
-*Tài nguyên: RTX 3060 dùng tối đa khoảng 50%, VRAM 1,9 / 12 GiB.*
+*Biểu đồ GPU, CPU và RAM của máy trong lần chạy đó.*
 
 ## Kết quả (RTX 3060, 13/10/2026)
 
