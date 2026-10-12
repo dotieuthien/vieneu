@@ -41,20 +41,41 @@ VKong cho thuê GPU theo giờ và điều khiển hoàn toàn bằng CLI, nên 
 viết code → `vkong run` → gọi API qua tunnel localhost → chạy benchmark ngay trên máy GPU → tải log về → `vkong app stop`.
 Con người chỉ cần đọc kết quả và quyết định bước tiếp theo. Một RTX 3060 có giá khoảng $0.06–0.08/giờ.
 
+**1. Thuê máy và chạy server.** Chạy trong thư mục bản muốn deploy (`lite` hoặc `baseline`):
+
 ```bash
-cd lite                                # hoặc: cd baseline
-vkong validate && vkong run            # thuê RTX 3060, cài thư viện, chạy serve.py
-SERVE_URL=http://127.0.0.1:PORT        # PORT lấy từ URL VKong in ra
-curl "$SERVE_URL/health"
-curl "$SERVE_URL/v1/audio/speech" -H 'Content-Type: application/json' \
-  -d '{"input":"Xin chào.","response_format":"pcm"}' --output speech.pcm   # PCM 16-bit, mono, 48 kHz
-vkong attach <instance-id> --update    # sau khi sửa code
-vkong app stop vieneu-serving-lite     # trả máy; baseline: vieneu-original-baseline
+cd lite
+vkong validate                       # kiểm tra cấu hình vkong.yaml
+vkong run                            # thuê RTX 3060, cài thư viện, chạy serve.py
 ```
 
-`Ctrl+C` chỉ ngắt kết nối; máy vẫn tính tiền đến khi chạy `vkong app stop`.
+Đợi dòng `Workload running · http://127.0.0.1:PORT`; đó là địa chỉ của server trên máy bạn.
 
-Ảnh chụp từ dashboard VKong trong lần chạy đó:
+**2. Gọi thử API.** Mở terminal khác, thay `PORT` bằng cổng ở bước 1:
+
+```bash
+SERVE_URL=http://127.0.0.1:PORT
+curl "$SERVE_URL/health"             # server sẵn sàng chưa
+curl "$SERVE_URL/v1/audio/speech" \
+  -H 'Content-Type: application/json' \
+  -d '{"input":"Xin chào.","response_format":"pcm"}' \
+  --output speech.pcm                # audio PCM 16-bit, mono, 48 kHz
+```
+
+**3. Cập nhật code** trên máy đang thuê (không cần thuê lại):
+
+```bash
+vkong instances                      # xem <instance-id> (dạng vk_...)
+vkong attach <instance-id> --update
+```
+
+**4. Trả máy** khi dùng xong. `Ctrl+C` chỉ ngắt kết nối, máy vẫn tính tiền cho tới lệnh này:
+
+```bash
+vkong app stop vieneu-serving-lite   # bản baseline: vkong app stop vieneu-original-baseline
+```
+
+Ảnh chụp từ dashboard VKong, trong lần chạy lite để tạo giọng đọc cho video:
 
 ![Tiến trình chạy app vieneu-serving-lite trên VKong](docs/vkong_app.png)
 
