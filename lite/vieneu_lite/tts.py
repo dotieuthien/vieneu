@@ -14,6 +14,7 @@ from vieneu import Vieneu
 from vieneu_utils.core_utils import gaps_to_silence, max_expected_frames, pause_pad_samples
 from vieneu_utils.phonemize_text import normalize_to_chunks_v3_with_gaps, phonemize_text_with_emotions
 
+from .profiler import PROF
 from .scheduler import Request, Sampling, Scheduler
 
 log = logging.getLogger(__name__)
@@ -23,11 +24,14 @@ SAMPLE_RATE = 48_000
 
 class LiteTTS:
     def __init__(self, *, max_streams: int = 16, decode_frames: int = 4, leadin_frames: int = 2,
-                 overlap_codec: bool = True, watermark: bool = True, max_chars: int = 256,
-                 max_new_frames: int = 300):
+                 overlap_codec: bool = True, codec_graphs: bool = True, codec_ring: bool = True,
+                 codec_dtype: str = "fp32", verify_codec: bool = False,
+                 watermark: bool = True, max_chars: int = 256, max_new_frames: int = 300):
         self.sdk = Vieneu(mode="v3turbo", backend="pytorch", device="cuda")
         self.sched = Scheduler(self.sdk.engine, max_streams=max_streams, decode_frames=decode_frames,
-                               leadin_frames=leadin_frames, overlap_codec=overlap_codec)
+                               leadin_frames=leadin_frames, overlap_codec=overlap_codec,
+                               codec_graphs=codec_graphs, codec_ring=codec_ring,
+                               codec_dtype=codec_dtype, verify_codec=verify_codec)
         self.watermarker = self.sdk.watermarker if watermark else None
         if watermark and self.watermarker is None:
             log.warning("watermark requested but resemble-perth is not installed; audio is NOT watermarked")
@@ -52,11 +56,13 @@ class LiteTTS:
         sampling.check()
         preset = self.sdk.get_preset_voice(voice)          # ValueError if unknown
         spk, ref_codes = preset["speaker_emb"], preset.get("codes")
-        chunks, gaps = normalize_to_chunks_v3_with_gaps(text, max_chars=self.max_chars)
+        with PROF.region("text.split"):
+            chunks, gaps = normalize_to_chunks_v3_with_gaps(text, max_chars=self.max_chars)
         pauses = gaps_to_silence(gaps)
 
         def submit(i: int) -> Request:
-            ph = phonemize_text_with_emotions(chunks[i])
+            with PROF.region("text.phonemize"):
+                ph = phonemize_text_with_emotions(chunks[i])
             cap = min(self.max_new_frames, max_expected_frames(ph))   # stop babbling past a missed EOS
             return self.sched.submit(ph, spk, ref_codes, cap, sampling)
 
@@ -90,6 +96,7 @@ class LiteTTS:
                 if r is not None:
                     r.close()
 
+    @PROF.timed("watermark")
     def _watermark(self, wav: np.ndarray) -> np.ndarray:
         if self.watermarker is None:
             return wav

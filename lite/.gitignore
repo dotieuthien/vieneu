@@ -3,3 +3,4 @@
 __pycache__/
 *.pyc
 results/*.wav
+results/profile/

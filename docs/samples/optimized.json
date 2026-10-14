@@ -1,0 +1,32 @@
+[
+  {
+    "i": 1,
+    "text": "Xin chào, đây là giọng đọc VieNeu phát trực tiếp qua API chuẩn OpenAI.",
+    "voice": "Adam bựa",
+    "seconds": 4.24
+  },
+  {
+    "i": 2,
+    "text": "Hôm nay trời Hà Nội se lạnh, gió mùa đông bắc tràn về từ sáng sớm.",
+    "voice": "Adam bựa",
+    "seconds": 3.68
+  },
+  {
+    "i": 3,
+    "text": "VieNeu-TTS là mô hình đọc tiếng Việt chạy được thời gian thực. Gửi một đoạn văn, chỉ khoảng một phần mười giây sau đã nghe được tiếng đầu tiên. Phần còn lại được phát tiếp trong lúc mô hình vẫn đang tạo.",
+    "voice": "Adam bựa",
+    "seconds": 9.12
+  },
+  {
+    "i": 4,
+    "text": "Ngày 14 tháng 10 năm 2026, giá vàng tăng 1,5% lên 85 triệu đồng một lượng.",
+    "voice": "Adam bựa",
+    "seconds": 5.68
+  },
+  {
+    "i": 5,
+    "text": "Cảm ơn bạn đã lắng nghe, chúc bạn một ngày làm việc thật hiệu quả.",
+    "voice": "Trúc Ly",
+    "seconds": 3.04
+  }
+]

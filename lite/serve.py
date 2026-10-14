@@ -2,6 +2,7 @@
 from contextlib import asynccontextmanager
 from importlib.metadata import version
 from pathlib import Path
+import faulthandler
 import io
 import logging
 import os
@@ -9,6 +10,7 @@ import struct
 import socket
 import subprocess
 import sys
+import threading
 import time
 import uuid
 import wave
@@ -18,11 +20,12 @@ import numpy as np
 import torch
 import uvicorn
 from fastapi import FastAPI, HTTPException, Query, Header
-from fastapi.responses import StreamingResponse
+from fastapi.responses import PlainTextResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from bench_support import Trace, prepare_gpu, reset_seed
 
+from vieneu_lite.profiler import PROF, TraceBusy
 from vieneu_lite.scheduler import Sampling
 from vieneu_lite.tts import SAMPLE_RATE, LiteTTS
 
@@ -32,22 +35,51 @@ log = logging.getLogger("vieneu_lite.api")
 MODEL_ID = "vieneu-v3-turbo"
 RESULTS = Path(__file__).resolve().parent / "results"
 RESULTS.mkdir(exist_ok=True)
+# Traces and reports; on VKong point it at the storage volume to pull them back.
+PROFILE_DIR = Path(os.getenv("PROFILE_DIR", RESULTS / "profile"))
+
+
+def _watchdog(sched, stall: float = 30.0) -> None:
+    """PROFILE=1: print every thread's stack when rows are active but no frame has
+    advanced for ``stall`` seconds (a GPU hang leaves no Python error behind)."""
+    last, since = -1, time.monotonic()
+    while True:
+        time.sleep(5)
+        if sched.tick != last or not sched.n_active:
+            last, since = sched.tick, time.monotonic()
+        elif time.monotonic() - since > stall:
+            log.error("no frame for %.0fs with %d active rows; stacks:", time.monotonic() - since, sched.n_active)
+            faulthandler.dump_traceback(all_threads=True)
+            since = time.monotonic()
 
 
 @asynccontextmanager
 async def lifespan(app):
     prepare_gpu()
     t = time.perf_counter()
+    faulthandler.dump_traceback_later(60, repeat=True)   # a hung startup prints every thread's stack
     subprocess.run(["nvidia-smi"], check=True)
     app.state.tts = LiteTTS(
         max_streams=int(os.getenv("MAX_STREAMS", "16")),
         decode_frames=int(os.getenv("DECODE_FRAMES", "4")),
         leadin_frames=int(os.getenv("LEADIN_FRAMES", "2")),
         overlap_codec=os.getenv("OVERLAP_CODEC", "1") != "0",
+        codec_graphs=os.getenv("CODEC_GRAPHS", "1") != "0",
+        codec_ring=os.getenv("CODEC_RING", "1") != "0",
+        codec_dtype=os.getenv("CODEC_DTYPE", "fp32"),
+        verify_codec=os.getenv("CODEC_VERIFY", "0") == "1",
         watermark=os.getenv("WATERMARK", "1") != "0",
     )
     app.state.benchmark = None
     app.state.tts.warmup()
+    if PROF.enabled:
+        anatomy = PROF.anatomy["text"] if PROF.anatomy else "no frame anatomy"
+        log.info("PROFILE=1, files in %s\n%s", PROFILE_DIR, anatomy)
+        PROFILE_DIR.mkdir(parents=True, exist_ok=True)
+        (PROFILE_DIR / "anatomy.txt").write_text(anatomy + "\n")
+        PROF.reset()                     # the window starts after warmup
+        threading.Thread(target=_watchdog, args=(app.state.tts.sched,), name="watchdog", daemon=True).start()
+    faulthandler.cancel_dump_traceback_later()
     log.info("ready in %.1fs", time.perf_counter() - t)
     yield
     job = app.state.benchmark
@@ -145,9 +177,44 @@ def health():
     return {"status": "ok", "backend": "pytorch-lite", "gpu": torch.cuda.get_device_name(),
             "sample_rate": SAMPLE_RATE, "max_streams": s.B, "decode_frames": s.K,
             "leadin_frames": s.leadin, "overlap_codec": s.overlap_codec,
+            "codec_graphs": s.codec_graphs, "codec_check": s.codec_check,
             "active": s.n_active, "pending": s.n_pending,
-            "watermark": tts.watermarker is not None, "cuda": torch.version.cuda,
+            "watermark": tts.watermarker is not None, "profile": PROF.enabled, "cuda": torch.version.cuda,
             "versions": {p: version(p) for p in ("vieneu", "torch", "transformers", "sea-g2p")}}
+
+
+def _profiling():
+    if not PROF.enabled:
+        raise HTTPException(404, "start the server with PROFILE=1")
+
+
+@app.get("/profile")
+def profile(format: Literal["text", "json"] = "text"):
+    """Per-region host/GPU time since the last reset (see vieneu_lite/profiler.py)."""
+    _profiling()
+    snap = PROF.snapshot()
+    return snap if format == "json" else PlainTextResponse(PROF.report(snap) + "\n")
+
+
+@app.post("/profile/reset")
+def profile_reset():
+    _profiling()
+    PROF.reset()
+    return {"status": "reset"}
+
+
+@app.post("/profile/trace")
+def profile_trace(seconds: float = Query(2.0, gt=0, le=10),
+                  format: Literal["text", "json"] = "text"):
+    """torch.profiler over every thread for ``seconds``. Saves ``trace-*.json.gz`` (Perfetto)
+    and ``trace-*.txt`` (this summary + the live report) in PROFILE_DIR."""
+    _profiling()
+    try:
+        s = PROF.trace(seconds, PROFILE_DIR)
+    except TraceBusy as e:
+        raise HTTPException(409, str(e))
+    (PROFILE_DIR / s["file"].replace(".json.gz", ".txt")).write_text(PROF.report() + "\n")
+    return s if format == "json" else PlainTextResponse(s["text"] + "\n")
 
 
 @app.post("/benchmark")
@@ -169,6 +236,23 @@ async def benchmark(concurrency: int = Query(8, ge=1, le=32),
               file=output, flush=True)
         app.state.benchmark = subprocess.Popen(
             command, cwd=RESULTS.parent, stdout=output, stderr=subprocess.STDOUT)
+    return {"status": "started", "results": f"/results/{name}"}
+
+
+@app.post("/stress")
+async def stress(concurrency: int = Query(32, ge=1, le=64), duration: float = Query(180, gt=0, le=1800)):
+    """BENCH_MODE=1: stress.py on this host (sustained greedy load + quality check)."""
+    if os.getenv("BENCH_MODE") != "1":
+        raise HTTPException(404)
+    job = app.state.benchmark
+    if job and job.poll() is None:
+        raise HTTPException(409, "Benchmark already running")
+    base = f"http://127.0.0.1:{int(os.getenv('PORT', '8000'))}"
+    name = f"stress-{concurrency}.log"
+    with (RESULTS / name).open("w") as output:
+        app.state.benchmark = subprocess.Popen(
+            [sys.executable, "-u", "stress.py", "--base", base, "--concurrency", str(concurrency),
+             "--duration", str(duration)], cwd=RESULTS.parent, stdout=output, stderr=subprocess.STDOUT)
     return {"status": "started", "results": f"/results/{name}"}
 
 

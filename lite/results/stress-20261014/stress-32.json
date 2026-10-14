@@ -1,0 +1,71 @@
+{
+  "concurrency": 32,
+  "duration_s": 181.56734943389893,
+  "requests": 1824,
+  "ok": 1824,
+  "errors": [],
+  "audio_s_per_s": 53.37082922790512,
+  "ttfa_ms": {
+    "0.5": 304.8399710096419,
+    "0.9": 391.6375740082003,
+    "0.99": 470.3639099607244
+  },
+  "rtf": {
+    "0.5": 0.6034800250054104,
+    "0.9": 0.6908577483786589,
+    "0.99": 0.7422426234988961
+  },
+  "silent_or_clipped": 112,
+  "duration_vs_alone": {
+    "0.01": 0.888888888888889,
+    "0.5": 1.0,
+    "0.99": 1.0888888888888888
+  },
+  "asr": "vinai/PhoWhisper-small",
+  "cer_alone": {
+    "0.5": 0.04411764705882353,
+    "0.9": 0.11764705882352941,
+    "1.0": 0.19117647058823528
+  },
+  "cer_load": {
+    "0.5": 0.01775147928994083,
+    "0.9": 0.1323529411764706,
+    "1.0": 0.3235294117647059
+  },
+  "cer_load_over_0.2": 4,
+  "load_sampled": 150,
+  "worst_load": [
+    {
+      "text": 0,
+      "cer": 0.3235294117647059,
+      "asr": "xin chào đây là giọng đọc vi ni lưu phát trực tiếp qua ây pi ai chuẩn mở ô phần ây ai."
+    },
+    {
+      "text": 0,
+      "cer": 0.3088235294117647,
+      "asr": "xin chào đây là giọng đọc vi niu phát trực tiếp qua thi hài chuyển động vấn đề ai."
+    },
+    {
+      "text": 0,
+      "cer": 0.25,
+      "asr": "xin chào đợi giọng đọc vay nguyên phát trực tiếp qua a pi ai chuẩn open ai."
+    }
+  ],
+  "alone_asr": [
+    {
+      "text": 0,
+      "cer": 0.08823529411764706,
+      "asr": "xin chào đây là giọng đọc vị niu phát trực tiếp qua ap a chuẩn open ai."
+    },
+    {
+      "text": 1,
+      "cer": 0.0,
+      "asr": "hôm nay trời hà nội se lạnh gió mùa đông bắc tràn về từ sáng sớm."
+    },
+    {
+      "text": 2,
+      "cer": 0.0,
+      "asr": "công nghệ chuyển văn bản thành giọng nói đang thay đổi cách chúng ta nghe tin tức đọc sách và học ngoại ngữ một mô hình tốt cần đọc tự nhiên đúng dấu và ngắt nghỉ hợp lý."
+    }
+  ]
+}

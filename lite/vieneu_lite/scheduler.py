@@ -7,14 +7,15 @@ frames of every row through ONE streaming codec session.
 
 With ``overlap_codec`` (design §7.1, §7.3) the codec runs on its own thread and
 CUDA stream: the worker packs each decode into a ``CodecJob`` (codes already
-copied out of the ring on the GPU, rows in session order, finalize, reset) and
-keeps stepping while the codec thread runs the jobs FIFO. The worker runs on its
-own stream too, so the two only meet through the job's CUDA event. Without it,
-the worker runs each job itself on the default stream (the original behaviour).
+copied out of the ring on the GPU, rows that finish) and keeps stepping while
+the codec thread runs the jobs FIFO. The worker runs on its own stream too, so
+the two only meet through the job's CUDA event. Without it, the worker runs each
+job itself on the default stream (the original behaviour).
 
-Invariant: the MOSS streaming decoder keeps per-row state BY POSITION in the
-list it is given, so ``_codec_rows`` (append on admit, drop on finalize) must
-be passed in exactly the same order on every call.
+The codec is ``SlotCodec`` (codec.py): a row keeps its scheduler slot in the
+codec, rows with the same number of new frames share one forward, and a slot's
+codec state is reset by the job that finalises its row. Jobs run FIFO, so that
+reset always lands before the first job of the slot's next row.
 """
 from __future__ import annotations
 
@@ -24,12 +25,14 @@ import logging
 import queue
 import threading
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import torch
 
+from .codec import SlotCodec, verify
 from .frame import StreamFrame, check_sampling
+from .profiler import PROF
 
 log = logging.getLogger(__name__)
 
@@ -67,6 +70,7 @@ class Request:
         self.f0 = 0                           # tick of the row's first frame
         self.decoded_upto = 0                 # tick up to which audio was emitted
         self.finished_at: Optional[int] = None
+        self.marks: dict = {}                 # stage -> perf_counter, PROFILE=1 only
 
     def __iter__(self):
         try:
@@ -76,8 +80,10 @@ class Request:
                     return
                 if isinstance(item, BaseException):
                     raise item
+                PROF.mark(self, "consumed")
                 yield item
         finally:
+            PROF.request_done(self)
             self.close()
 
     def close(self) -> None:
@@ -92,39 +98,51 @@ class Request:
 @dataclass
 class CodecJob:
     """One codec call, decided by the worker; the codec side only executes it."""
-    reqs: List[Request]                   # codec rows, in the session's order
-    rows: List[Optional[torch.Tensor]]    # (n_vq, n) codes per row; None -> one dummy frame
-    real: List[int]                       # new frames per row (audio kept per row)
-    finalize: List[int]                   # positions leaving the session in this call
-    reset_before: bool                    # first call of a fresh session
-    reset_after: bool                     # no rows left: close the session afterwards
+    rows: List[Tuple[Request, torch.Tensor]]   # rows with new frames: (request, codes (n_vq, n))
+    done: List[Request]                        # rows that end with this job (audio then None)
     ready: Optional[torch.cuda.Event] = field(default=None)   # codes are on the device
+
+    @property
+    def reqs(self) -> List[Request]:
+        return [r for r, _ in self.rows] + [r for r in self.done if all(r is not x for x, _ in self.rows)]
 
 
 class Scheduler:
     def __init__(self, engine, *, max_streams: int = 16, decode_frames: int = 4,
-                 leadin_frames: int = 2, max_admit_per_tick: int = 8, overlap_codec: bool = True,
-                 codec_queue: int = 1):
+                 leadin_frames: int = 2, max_admit_per_tick: int = 16, overlap_codec: bool = True,
+                 codec_queue: int = 1, codec_graphs: bool = True, codec_ring: bool = True,
+                 codec_dtype: str = "fp32", verify_codec: bool = False):
         """``engine`` is ``vieneu``'s ``VieNeuTTSv3Turbo`` (model, codec, prompt builder).
 
         ``codec_queue`` bounds the jobs waiting behind the one being decoded. The
         codec is the slower side, so 1 already keeps it busy; a deeper queue only
-        adds latency to every newcomer's first audio.
+        adds latency to every newcomer's first audio. ``codec_graphs`` replays the
+        codec as CUDA graphs; ``verify_codec`` first checks ``SlotCodec`` against the
+        SDK's streaming decode (``self.codec_check``).
         """
         self.engine = engine
         self.model = engine.model
-        self.codec = engine.audio_tokenizer
         self.device = engine.device
         self.B = max_streams
         self.K = decode_frames
         self.leadin = max(1, min(leadin_frames, decode_frames))
         self.max_admit = max_admit_per_tick
         self.frame = StreamFrame(self.model, self.B, int(self.model.config.max_position_embeddings))
+        if PROF.enabled:
+            PROF.frame_anatomy(self.frame)     # before any other thread touches the GPU
         self.n_vq = self.frame.n_vq
+        tok = engine.audio_tokenizer
+        self.codec_check = None
+        if verify_codec:
+            self.codec_check = verify(tok, self.B, self.n_vq, self.K, graphs=codec_graphs,
+                                      ring=codec_ring, dtype=codec_dtype)
+            log.info("codec check vs the SDK's fp32 streaming decode: %s", self.codec_check)
+        self.codec = SlotCodec(tok, self.B, self.n_vq, self.K, graphs=codec_graphs, ring=codec_ring,
+                               dtype=codec_dtype)
+        self.codec_graphs = self.codec.graphs
         self.tick = 0
         self.slots: List[Optional[Request]] = [None] * self.B
-        self._codec_rows: List[Request] = []
-        self._codec_fresh = True
+        self._codec_rows: List[Request] = []    # admitted rows whose audio is not finished
         self._pending: "collections.deque[Request]" = collections.deque()
         self._cv = threading.Condition()
         self._running = True
@@ -149,11 +167,13 @@ class Scheduler:
         if max_frames < 1:
             raise ValueError("max_frames must be >= 1")
         e = self.engine
-        prompt = e._build_prompt_2d(phonemes, None, ref_codes, e._resolve_style_id())
+        with PROF.region("submit.prompt"):
+            prompt = e._build_prompt_2d(phonemes, None, ref_codes, e._resolve_style_id())
         if prompt.shape[0] + max_frames + 2 > self.frame.max_len:
             raise ValueError(f"prompt of {prompt.shape[0]} rows + {max_frames} frames "
                              f"does not fit the {self.frame.max_len}-token cache")
         req = Request(prompt, speaker_emb, max_frames, sampling)
+        PROF.mark(req, "submit")
         with self._cv:
             if self.error is not None:
                 raise RuntimeError("scheduler is down") from self.error
@@ -190,7 +210,9 @@ class Scheduler:
                     with self._cv:
                         while (self._running and not self._pending and self.n_active == 0
                                and self._codec_error is None):
-                            self._cv.wait()
+                            PROF.unchain("tick")        # the next frame follows an idle wait
+                            with PROF.region("worker.idle"):
+                                self._cv.wait()
                         if self._codec_error is not None:
                             raise RuntimeError("codec thread failed") from self._codec_error
                         if not self._running:
@@ -212,8 +234,6 @@ class Scheduler:
         finally:
             if self._codec_q is not None:
                 self._codec_q.put(None)       # codec thread finishes queued jobs, then exits
-            else:
-                self._reset_codec()
 
     def _take_pending(self) -> List[Request]:
         """Pop up to ``min(free slots, max_admit)`` live requests (caller holds ``_cv``)."""
@@ -224,10 +244,12 @@ class Scheduler:
             if r.cancelled:
                 r.audio.put(None)
             else:
+                PROF.mark(r, "taken")
                 todo.append(r)
         return todo
 
     @torch.no_grad()
+    @PROF.timed("admit", gpu=True)
     def _admit(self, todo: List[Request]) -> None:
         # Build each prompt on its own: a bad voice/prompt fails only that request.
         reqs, embeds, spks = [], [], []
@@ -268,7 +290,9 @@ class Scheduler:
             r.slot, r.f0, r.decoded_upto = b, self.tick, self.tick
             self.slots[b] = r
             self._codec_rows.append(r)
+            PROF.mark(r, "admitted")
 
+    @PROF.timed("admit.prefill", gpu=True)
     def _prefill(self, embeds: List[torch.Tensor]):
         """One HF forward over left-padded prompts -> ``(last_hidden (n, H), [(k, v)] per layer, T)``."""
         n, T = len(embeds), max(e.shape[0] for e in embeds)
@@ -287,6 +311,7 @@ class Scheduler:
             kv = list(zip(cache.key_cache, cache.value_cache))
         return out.last_hidden_state[:, -1], kv, T
 
+    @PROF.timed("step")
     def _step(self) -> None:
         self.frame.replay()
         self.tick += 1
@@ -299,41 +324,41 @@ class Scheduler:
             elif finished[b]:
                 r.finished_at = length[b]
                 r.gen_done.set()
-        leadin_due = any(r is not None and r.decoded_upto == r.f0 and self.tick - r.f0 >= self.leadin
-                         for r in self.slots)
-        if self.tick % self.K == 0 or leadin_due:
-            self._decode()
+        if self.tick % self.K == 0:
+            self._decode(self._codec_rows)
+        else:
+            # Off a K boundary only newcomers that reached their lead-in are decoded:
+            # every codec forward costs the same, so the others wait for the boundary.
+            due = [r for r in self._codec_rows
+                   if r.decoded_upto == r.f0 and self.tick - r.f0 >= self.leadin]
+            if due:
+                self._decode(due)
 
     @torch.no_grad()
-    def _decode(self) -> None:
-        """Pack the new frames of every codec row into a job, then run or queue it."""
-        if not self._codec_rows:
+    @PROF.timed("decode", gpu=True)
+    def _decode(self, which: List[Request]) -> None:
+        """Pack the new frames of ``which`` (codec rows) into a job, then run or queue it."""
+        if not which:
             return
-        # Every row has decoded_upto >= tick - K: a decode happens at least every K ticks.
+        # Every row has decoded_upto >= tick - K: all rows are decoded every K ticks.
         blk = self.frame.recent_codes(self.tick, self.K)      # (K, B, n_vq), frames [tick-K, tick), a copy
         base = self.tick - self.K
-        rows, real, finalize = [], [], []
-        for pos, r in enumerate(self._codec_rows):
+        rows, done = [], []
+        for r in which:
+            PROF.mark(r, "job")
             hi = self.tick if r.finished_at is None else min(r.finished_at, self.tick)
-            n = hi - r.decoded_upto
-            # Nothing new (e.g. finalised right on a boundary): the codec still wants
-            # a frame for this position, so it gets a dummy one whose output is dropped.
-            rows.append(blk[r.decoded_upto - base:hi - base, r.slot].T if n > 0 else None)   # (n_vq, n)
-            real.append(n)
+            if hi > r.decoded_upto:
+                rows.append((r, blk[r.decoded_upto - base:hi - base, r.slot].T))   # (n_vq, n)
             r.decoded_upto = hi
             if r.finished_at is not None and hi >= r.finished_at:
-                finalize.append(pos)
+                done.append(r)
 
-        # The codes are copied out of the ring, so finalised rows give their slot
+        # The codes are copied out of the ring, so finished rows give their slot
         # back now, not when their audio comes out of the codec.
-        for pos in finalize:
-            self.slots[self._codec_rows[pos].slot] = None
-        gone = set(finalize)
-        keep = [r for pos, r in enumerate(self._codec_rows) if pos not in gone]
-        job = CodecJob(self._codec_rows, rows, real, finalize,
-                       reset_before=self._codec_fresh, reset_after=not keep)
-        self._codec_rows = keep
-        self._codec_fresh = not keep
+        for r in done:
+            self.slots[r.slot] = None
+        self._codec_rows = [r for r in self._codec_rows if all(r is not d for d in done)]
+        job = CodecJob(rows, done)
 
         if self._codec_q is None:
             self._run_job(job)
@@ -341,7 +366,8 @@ class Scheduler:
         blk.record_stream(self._codec_stream)    # don't let the allocator reuse it under the codec
         job.ready = torch.cuda.Event()
         job.ready.record()                       # on the worker's stream, after the copy
-        self._codec_q.put(job)                   # blocks while the codec is behind: backpressure
+        with PROF.region("decode.backpressure"):
+            self._codec_q.put(job)               # blocks while the codec is behind: backpressure
 
     # ── codec side ──────────────────────────────────────────────────────────
 
@@ -350,7 +376,8 @@ class Scheduler:
         worker never blocks on a full queue, failing every request it hands over."""
         with torch.cuda.stream(self._codec_stream):
             while True:
-                job = self._codec_q.get()
+                with PROF.region("codec.idle"):
+                    job = self._codec_q.get()
                 if job is None:
                     break
                 if self._codec_error is not None:
@@ -366,38 +393,28 @@ class Scheduler:
                         self._cv.notify()
                     for r in job.reqs:
                         r.fail(e)
-            self._reset_codec()
 
     @torch.no_grad()
+    @PROF.timed("codec")
     def _run_job(self, job: CodecJob) -> None:
         if job.ready is not None:
             torch.cuda.current_stream().wait_event(job.ready)
-        dev = next((x.device for x in job.rows if x is not None), self.device)
-        rows = [x if x is not None else torch.zeros(self.n_vq, 1, dtype=torch.long, device=dev)
-                for x in job.rows]
-        out = self.codec.batch_decode(
-            rows, num_quantizers=self.n_vq, streaming=True, max_batch_size=self.B,
-            reset_stream=job.reset_before, finalize_indices=job.finalize or None,
-        )
-        audio = out.audio.float().mean(1).cpu().numpy()     # (rows, samples), channels averaged
-        lens = out.audio_lengths.tolist() if getattr(out, "audio_lengths", None) is not None \
-            else [audio.shape[-1]] * len(rows)
-
-        finalize = set(job.finalize)
-        for pos, r in enumerate(job.reqs):
-            n = min(int(lens[pos]), job.real[pos] * SAMPLES_PER_FRAME)
-            if n > 0 and not r.cancelled:
-                r.audio.put(np.array(audio[pos, :n], dtype=np.float32))
-            if pos in finalize:
-                r.audio.put(None)
-        if job.reset_after:
-            self._reset_codec()
-
-    def _reset_codec(self) -> None:
-        """Close the codec's streaming session (runs on the codec side only)."""
-        reset = getattr(self.codec, "_reset_batch_decode_streaming_state", None)
-        if callable(reset):
-            try:
-                reset()
-            except Exception:   # noqa: BLE001
-                log.warning("codec stream reset failed", exc_info=True)
+        groups: Dict[int, List[Tuple[Request, torch.Tensor]]] = {}
+        for r, c in job.rows:
+            PROF.mark(r, "codec")
+            groups.setdefault(c.shape[1], []).append((r, c))
+        out = []
+        with PROF.region("codec.decode", gpu=True):
+            for n, rows in groups.items():                 # one forward per frame count
+                audio = self.codec.decode(n, [r.slot for r, _ in rows], torch.stack([c for _, c in rows], 1))
+                out.append((rows, audio.float().mean(1)))   # (rows, n * 3840), channels averaged
+        with PROF.region("codec.d2h"):
+            out = [(rows, audio.cpu().numpy()) for rows, audio in out]
+        self.codec.reset([r.slot for r in job.done])
+        for rows, audio in out:
+            for k, (r, _) in enumerate(rows):
+                if not r.cancelled:
+                    PROF.mark(r, "audio")
+                    r.audio.put(np.array(audio[k], dtype=np.float32))
+        for r in job.done:
+            r.audio.put(None)

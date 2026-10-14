@@ -1,0 +1,1 @@
+c=1 n=4 err=0 TTFA p50 1169 ms RTF p50 0.95 (client via tunnel)

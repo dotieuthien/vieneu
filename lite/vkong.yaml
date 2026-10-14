@@ -2,7 +2,7 @@ type: service
 app: vieneu-serving-lite
 app_port: 8000
 
-gpu: RTX 3060
+gpu: RTX-3060-12GB   # exact card of the earlier benchmarks; bare "RTX 3060" also allows 8 GB / Ti
 num_gpus: 1
 cpu_cores: 4
 ram_gb: 16
@@ -13,4 +13,6 @@ verified_only: true
 image: pytorch/pytorch:2.8.0-cuda12.8-cudnn9-runtime
 init_cmd: pip install -r requirements.txt
 # WATERMARK=0 to match the baseline benchmark (baseline passes apply_watermark=False).
-start: env WATERMARK=0 OMP_NUM_THREADS=4 python -u serve.py
+# PROFILE=1 turns the profiler on (vieneu_lite/profiler.py); files under results/profile/,
+# served at /results/profile/. BENCH_MODE=1 enables /benchmark?repeats=N on the GPU host.
+start: env PROFILE=1 BENCH_MODE=1 CODEC_VERIFY=1 MAX_STREAMS=32 WATERMARK=0 OMP_NUM_THREADS=4 python -u serve.py

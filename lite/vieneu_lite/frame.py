@@ -19,6 +19,8 @@ import torch
 import torch.nn.functional as F
 from transformers.models.qwen3.modeling_qwen3 import apply_rotary_pos_emb
 
+from .profiler import PROF
+
 
 class RepHistory:
     """Sliding-window repetition history on the device, ``B`` rows x ``n_vq`` codebooks.
@@ -125,6 +127,7 @@ class StaticBackbone:
         self.bias[b, 0, 0].index_fill_(0, idx, 0.0)
         self.pos[b] = T
 
+    @PROF.scoped("frame.backbone")
     def step(self, x: torch.Tensor) -> torch.Tensor:
         """``x`` (B, 1, H) -> last hidden (B, H); advances ``cur`` and ``pos``."""
         B, g = self.B, self.n_heads // self.n_kv
@@ -142,10 +145,11 @@ class StaticBackbone:
             self.v[i][:, :, idx] = v
             # GQA: fold the g query heads sharing a KV head into the q_len axis
             # (exact; ``enable_gqa`` falls back to the slow math path).
-            attn = F.scaled_dot_product_attention(
-                q.view(B, self.n_kv, g, self.hd), self.k[i], self.v[i],
-                attn_mask=self.bias, scale=a.scaling,
-            )
+            with PROF.scope("frame.attn"):
+                attn = F.scaled_dot_product_attention(
+                    q.view(B, self.n_kv, g, self.hd), self.k[i], self.v[i],
+                    attn_mask=self.bias, scale=a.scaling,
+                )
             x = x + a.o_proj(attn.reshape(B, 1, -1))
             x = x + layer.mlp(layer.post_attention_layernorm(x))
         self.cur += 1
@@ -227,7 +231,10 @@ class StreamFrame:
         self.bb.reset()
 
     # ── graph body ──────────────────────────────────────────────────────────
+    # ``PROF.scope``/``scoped`` only label the eager anatomy run (PROFILE=1); a
+    # replay never runs this Python.
 
+    @PROF.scoped("frame.sample")
     def _sample(self, ch: int, hidden: torch.Tensor) -> torch.Tensor:
         logits = self.model.audio_lm_heads[ch](hidden).float()
         logits = self.rep.penalise(logits, ch, self.penalty)
@@ -235,6 +242,7 @@ class StreamFrame:
         self.rep.add(ch, code, self.frame)
         return code
 
+    @PROF.scoped("frame.acoustic")
     def _acoustic(self):
         """One acoustic frame for all slots -> ``(codes (B, n_vq), is_eos (B,))``."""
         m, cfg = self.model, self.cfg
@@ -269,6 +277,7 @@ class StreamFrame:
     # ── host side ───────────────────────────────────────────────────────────
 
     @torch.no_grad()
+    @PROF.timed("admit.load", gpu=True)
     def admit(self, b: int, f0: int, keys: List[torch.Tensor], values: List[torch.Tensor],
               h_last: torch.Tensor, spk: Optional[torch.Tensor], cap: int, *,
               temperature: float, top_k: int, top_p: float, repetition_penalty: float) -> None:
@@ -291,9 +300,11 @@ class StreamFrame:
         self.length[b] = 0
         self.finished[b] = False
 
+    @PROF.timed("step.replay", gpu=True, chain="tick")
     def replay(self) -> None:
         self.graph.replay()
 
+    @PROF.timed("step.status")
     def status(self):
         """``(finished, length)`` as host lists, in one device->host read."""
         st = torch.stack([self.finished.long(), self.length]).tolist()

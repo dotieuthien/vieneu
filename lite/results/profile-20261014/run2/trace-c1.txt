@@ -1,0 +1,41 @@
+trace 2.0 s -> trace-20261014-110031.json.gz (open in https://ui.perfetto.dev)
+CUPTI adds ~1-2 us to every launch while tracing: compare regions, not absolutes.
+GPU busy 20.5% of the window; 1474 idle gaps > 0.1 ms, 1225 ms in total
+  stream 21     busy   7.6%  47475 ops
+  stream 25     busy  14.0%  13931 ops
+
+per region, per call, nested regions excluded (ms; launch = kernel/copy launches):
+region               calls     host  launch graph launch ms sync/copy gpu ops kernel ms  us/op  verdict
+text.split               1     6.79       0     0      0.00      0.00       0      0.00    0.0  CPU only
+text.phonemize           1     0.08       0     0      0.00      0.00       0      0.00    0.0  CPU only
+submit.prompt            1     1.52       0     0      0.00      0.00       0      0.00    0.0  CPU only
+watermark                4     0.12       0     0      0.00      0.00       0      0.00    0.0  CPU only
+admit                    1    12.90     117     0      1.95      0.08     119      0.23    1.9  launch/CPU-bound
+admit.prefill            1    45.88     736     0      8.36      0.05     738      4.64    6.3  launch/CPU-bound
+admit.load               1     2.69      37     0      0.45      0.11      43      0.10    2.3  launch/CPU-bound
+step                    15     0.32       0     0      0.00      0.00       0      0.00    0.0  CPU only
+step.replay             16     7.49       2     0      0.03      0.00       2      0.00    1.0  launch/CPU-bound
+step.status             16     9.41       2     0      0.04      9.10       3      0.01    1.8  waits on GPU
+decode                   4     1.23       3     0      0.05      0.00       3      0.01    2.0  launch/CPU-bound
+decode.backpressure      4    26.87       0     0      0.00      0.00       0      0.00    0.0  CPU only
+codec.idle               4   272.69       0     0      0.00      0.00       0      0.00    0.0  CPU only
+codec                    3     1.39       0     0      0.00      0.00       0      0.00    0.0  CPU only
+codec.decode             3   180.79    2456     0     29.32      4.85    2752     54.37   19.8  launch/CPU-bound
+codec.d2h                4     0.41       1     0      0.02      0.09       3      0.01    3.3  launch/CPU-bound
+
+top GPU ops by time:
+   19.5%     166x    507.7 us  fmha_cutlassF_f32_aligned_64x64_rf_sm80(PyTorchMemEffAttention::AttentionKernel<float, cutlass::arch
+    8.4%     498x     72.9 us  void at::native::elementwise_kernel<128, 2, at::native::gpu_kernel_impl_nocast<at::native::(anonymou
+    8.3%    1104x     32.3 us  void at::native::elementwise_kernel<128, 2, at::native::gpu_kernel_impl_nocast<at::native::direct_co
+    8.1%    1360x     25.6 us  Memcpy DtoD (Device -> Device)
+    4.8%     165x    125.0 us  void at::native::(anonymous namespace)::CatArrayBatchedCopy<at::native::(anonymous namespace)::Opaqu
+    4.7%    1488x     13.6 us  void cutlass::Kernel2<cutlass_80_wmma_tensorop_bf16_s161616gemm_bf16_16x16_128x2_tn_align8>(cutlass_
+    4.2%     192x     94.5 us  fmha_cutlassF_bf16_aligned_64x64_rf_sm80(PyTorchMemEffAttention::AttentionKernel<cutlass::bfloat16_t
+    4.0%     165x    104.3 us  void at::native::(anonymous namespace)::CatArrayBatchedCopy_alignedK_contig<at::native::(anonymous n
+    3.0%    1072x     12.3 us  void cutlass::Kernel2<cutlass_80_wmma_tensorop_bf16_s161616gemm_bf16_32x32_128x2_tn_align8>(cutlass_
+    2.1%     256x     34.8 us  fmha_cutlassF_bf16_aligned_64x128_rf_sm80(PyTorchMemEffAttention::AttentionKernel<cutlass::bfloat16_
+    1.8%    4351x      1.8 us  void at::native::elementwise_kernel<128, 2, at::native::gpu_kernel_impl_nocast<at::native::BinaryFun
+    1.6%     276x     25.3 us  ampere_sgemm_64x32_sliced1x4_tn
+    1.2%    2113x      2.5 us  void at::native::reduce_kernel<512, 1, at::native::ReduceOp<float, at::native::MeanOps<float, float,
+    1.2%     768x      6.6 us  void at::native::(anonymous namespace)::indexSelectSmallIndex<c10::BFloat16, long, unsigned int, 2, 
+    1.1%    2072x      2.3 us  void at::native::unrolled_elementwise_kernel<at::native::direct_copy_kernel_cuda(at::TensorIteratorB
