@@ -97,5 +97,6 @@ Những điều cần biết khi đo trên VKong (tunnel hay đứt, chốt giá
 | [lite/vieneu_lite/tts.py](lite/vieneu_lite/tts.py) | Cắt câu, phoneme, khoảng nghỉ |
 | [lite/vieneu_lite/profiler.py](lite/vieneu_lite/profiler.py) | Profiler, bật bằng `PROFILE=1` |
 | [lite/serve.py](lite/serve.py), [lite/benchmark.py](lite/benchmark.py), [lite/stress.py](lite/stress.py) | Server HTTP, client benchmark, bài thử tải và chất lượng |
-| [lite/results/](lite/results/) | Số đo gốc của mọi lần chạy |
+| [baseline/results/](baseline/results/), [lite/results/](lite/results/) | Số đo gốc của mọi lần chạy; thí nghiệm nào đo cả hai bản thì hai bên cùng cấu trúc |
+| [experiments/phase1/](experiments/phase1/) | Tính lại bảng, dựng lại đúng code đã đo và chạy lại giai đoạn 1 (xem [PHASE1.md](PHASE1.md#tự-kiểm-tra-và-chạy-lại)) |
 | [docs/](docs/) | Hai video, mẫu nghe, ảnh chụp VKong |
