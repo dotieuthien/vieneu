@@ -1,0 +1,49 @@
+window 16.1 s | host = wall time on its thread, nested regions excluded; gpu = CUDA-event span (incl. nested). ms unless noted.
+
+tick p50 9.3 ms -> 8.57x real time for every active stream (510 frames)
+
+region                calls  host p50       p99  total s  %win |   gpu p50       p99  what
+-- request threads
+text.split               10      2.88      7.95     0.03   0.2 |                      split the text into chunks
+text.phonemize           10      0.01     11.25     0.01   0.1 |                      phonemize one chunk
+submit.prompt            10      0.95      1.31     0.01   0.1 |                      tokenize one chunk's prompt
+watermark               140      0.00      0.00     0.00   0.0 |                      watermark one audio chunk
+-- worker
+worker.idle              10     53.32  10617.05    11.09  69.0 |                      worker waiting for requests
+admit                    10      4.93      7.43     0.05   0.3 |     33.09     45.00  newcomers: input embeddings, slicing the prefill KV
+admit.prefill            10     26.88     36.13     0.28   1.8 |     26.92     36.19  HF prefill of the newcomers (eager)
+admit.load               10      1.24      1.43     0.01   0.1 |      1.28      1.47  copy one prompt's KV into the ring cache (eager)
+step                    520      0.16      0.98     0.13   0.8 |                      per-slot bookkeeping after each frame (Python)
+step.replay             520      0.47      1.18     0.27   1.7 |      9.01     32.81  launch the frame graph; gpu = the frame
+step.status             520      8.51     32.20     7.32  45.5 |                      wait for the frame, read finished/length (sync)
+decode                  140      0.17      0.33     0.03   0.2 |      0.21      0.45  copy the new codes out of the ring, build the codec job
+decode.backpressure     140      0.01      0.04     0.00   0.0 |                      worker blocked: codec queue full
+tick.period             510      9.34     32.90     7.65  47.6 |                      one frame for every slot (real time: <= 80 ms)
+tick.gap                510                                    |      0.09      0.51  AR stream not running the graph between two frames
+-- codec
+codec.idle              140     27.30     72.47    14.60  90.8 |                      codec waiting for a job
+codec                   140     31.38     31.72     4.10  25.5 |                      codec job bookkeeping, splitting audio per row
+codec.decode            140      1.26      2.32     0.19   1.2 |     32.11     32.35  streaming codec over every row (eager)
+codec.d2h               140      0.14     26.83     0.28   1.8 |                      audio to host (sync)
+-- per text chunk
+req.queue                10      0.07      0.15     0.00   0.0 |                      submit -> taken by the worker
+req.admit                10     33.08     45.10     0.35   2.2 |                      taken -> in a slot (shared prefill)
+req.leadin               10     18.55     20.87     0.19   1.2 |                      in a slot -> first codec job packed
+req.codec_queue          10      0.92      1.00     0.01   0.1 |                      job packed -> codec starts it
+req.codec                10     26.66     28.12     0.27   1.7 |                      codec starts -> first audio out
+req.deliver              10      0.12      0.16     0.00   0.0 |                      first audio out -> read by the HTTP thread
+req.first_audio          10     79.26     94.88     0.82   5.1 |                      submit -> first audio read (no text work)
+req.total                10    843.61    915.58     8.46  52.6 |                      submit -> chunk done
+-- process
+gil.wait               7550      0.11      0.23     0.88   5.5 |                      a woken thread waiting for the GIL (+ ~0.1 ms timer slack)
+
+frame anatomy: one frame for all 16 slots (same cost whatever the occupancy)
+  eager: 1965 GPU ops, host 66.8 ms to launch them (34 us/op), GPU span 66.8 ms
+  graph: 1 launch, host 0.06 ms, GPU 9.2 ms; 2907 nodes, kernels 9.4 ms of a 9.6 ms span -> 0.2 ms of gaps between graph nodes (traced)
+  graph saves 57.7 ms per frame
+  sub-stages (eager, nested excluded; acoustic = decoder layers + embeddings + EOS head, backbone = without attention, eager = bookkeeping + input embeds):
+    frame.eager         131 ops     0.34 ms kernels ( 5.1%)    2.6 us/op
+    frame.acoustic     1041 ops     3.85 ms kernels (57.3%)    3.7 us/op
+    frame.sample         62 ops     0.16 ms kernels ( 2.4%)    2.6 us/op
+    frame.backbone      730 ops     2.27 ms kernels (33.8%)    3.1 us/op
+    frame.attn            1 ops     0.10 ms kernels ( 1.5%)   99.2 us/op

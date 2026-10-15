@@ -1,4 +1,4 @@
-"""Render docs/optimize.mp4 (+ .srt, poster): how the lite server was optimised, and why.
+"""Render docs/optimize.mp4 (+ .srt, poster): the codec optimisation, ~3 min, straight to the point.
 
     python docs/video/make_optimize_video.py --voice http://127.0.0.1:PORT   # đọc lời bằng server lite (bản tối ưu)
     python docs/video/make_optimize_video.py                                 # dùng giọng đã cache
@@ -25,7 +25,9 @@ OUT = Path(__file__).resolve().parents[1]
 NAME = "optimize"
 # Cách viết để TTS đọc đúng; phụ đề giữ chữ gốc.
 mv.SPOKEN.update({"key value": "ki va liu", "megabyte": "mê ga bai", "Profiler": "Bộ đo hiệu năng",
-                  "codec": "cô đéc", "model": "mô hình", "code cũ": "mã cũ"})
+                  "codec": "cô đéc", "Codec": "Cô đéc", "model": "mô hình", "Model": "Mô hình", "code cũ": "mã cũ",
+                  "0,9999993": "gần bằng một", "KV cache": "bộ nhớ ki va liu", "transformer": "trans pho mơ",
+                  "tính attention": "tính độ chú ý"})
 F_MONO = font(20, uni=True)
 F_BIG = font(56, True)
 
@@ -53,352 +55,337 @@ def hbar(d, x, y, length, h, color, a, label=None, value=None, f=F_B):
 
 # ── scenes: fn(d, p, t, ci) — p = 0..1 through the scene, ci = index of the current cue ──────────
 
+CHECK, CROSS = "✓", "✗"
+F_SYM = font(30, uni=True)
+LANE_BG = (232, 234, 238)
+Q = 0.0          # progress 0..1 through the current cue (render_frame sets it)
+STAGES = [(4, 4, "10 s", 500), (8, 2, "8 s", 800), (16, 2, "6 s", 1200), (32, 4, "4 s", 1600)]
+#          tokens/frame, layers, look-back window, window in tokens   (MOSS-Audio-Tokenizer-Nano decoder)
+
+
+def source(d, s, a=1.0):
+    """Where the number on screen comes from (small grey line under the title)."""
+    text(d, 62, 104, "Số liệu: " + s, F_XS, mix(MUTED, a))
+
+
+def lanes(d, x, y, w, cpu, gpu, title=None):
+    """Two time lanes. ``cpu``/``gpu``: [(start, end, colour, label)] in fractions of ``w``."""
+    if title:
+        text(d, x - 90, y - 34, title, F_B)
+    for k, (name, segs, col) in enumerate((("CPU", cpu, INK), ("GPU", gpu, BLUE))):
+        yy = y + k * 52
+        text(d, x - 90, yy + 8, name, F_B, col)
+        rbox(d, x, yy, w, 42, LANE_BG, r=8)
+        for s0, s1, c, lab in segs:
+            sw = max(4, (s1 - s0) * w - 2)
+            rbox(d, x + s0 * w, yy + 3, sw, 36, c, r=6)
+            if lab and sw > d.textlength(lab, font=F_XS) + 8:
+                ctext(d, x + s0 * w + sw / 2, yy + 21, lab, F_XS, (255, 255, 255))
+
+
+def old_codec_lanes():
+    """One codec call before the fix: per frame the CPU issues ~900 ops (the GPU picks them up
+    in slivers), then waits for the GPU to finish so it can read the audio lengths back."""
+    cpu, gpu = [], []
+    for i in range(4):
+        s = i / 4
+        cpu.append((s, s + 0.19, ORANGE, f"ra lệnh mẩu {i + 1}"))
+        cpu.append((s + 0.19, s + 0.25, RED, "chờ"))
+        for j in range(6):
+            g = s + 0.015 + j * 0.03
+            gpu.append((g, g + 0.008, BLUE, None))
+        gpu.append((s + 0.19, s + 0.24, BLUE, None))
+    return cpu, gpu
+
+
 def s_title(d, p, t, ci):
-    ctext(d, W / 2, 210, "Tối ưu VieNeu lite", font(56, True))
-    ctext(d, W / 2, 290, "Vì sao biết phải sửa ở đâu, và tham số chọn theo logic nào", F_H, MUTED)
-    ctext(d, W / 2, 335, "Lồng tiếng bằng chính bản tối ưu", F_B, BLUE)
+    ctext(d, W / 2, 230, "Tối ưu codec của VieNeu lite", font(52, True))
+    ctext(d, W / 2, 305, "đo → tìm chỗ chậm → sửa → kiểm tra", F_H, MUTED)
     for i, c in enumerate([BLUE, ORANGE, GREEN]):
-        wave(d, 290, 450, 700, 70, mix(c, 0.85), phase=t * 2 + i * 2.1, n=80)
-
-
-def s_principle(d, p, t, ci):
-    keep = ["Trọng số model", "Kiến trúc mạng", "Kiểu số fp32 của codec", "Cách chọn mã (sampling)"]
-    change = ["Gom việc cho GPU", "Bỏ những lần chờ thừa", "Bỏ những lần copy thừa", "Ghi lại bằng CUDA graph"]
-    a, b = appear(p, 0.02, 0.2), appear(p, 0.45, 0.62)
-    rbox(d, 100, 140, 500, 330, mix(tint(GREEN, 0.10), a), outline=mix(GREEN, a), r=18)
-    text(d, 130, 160, "Giữ nguyên", F_H, mix(GREEN, a))
-    bullet_lines(d, 130, 220, keep, [appear(p, 0.08 + 0.06 * i) for i in range(4)], dot=GREEN)
-    rbox(d, 680, 140, 500, 330, mix(tint(BLUE, 0.10), b), outline=mix(BLUE, b), r=18)
-    text(d, 710, 160, "Chỉ đổi", F_H, mix(BLUE, b))
-    bullet_lines(d, 710, 220, change, [appear(p, 0.5 + 0.06 * i) for i in range(4)], dot=BLUE)
-    c = appear(p, 0.8)
-    ctext(d, W / 2, 515, "Âm thanh phải ra y hệt: kiểm tra trước, rồi mới đo tốc độ", F_H, mix(RED, c))
+        wave(d, 290, 440, 700, 60, mix(c, 0.85), phase=t * 2 + i * 2.1, n=80)
 
 
 def s_measure(d, p, t, ci):
-    x0, scale = 400, 760 / 320            # px per ms; 320 ms of audio = the real-time budget
-    text(d, 100, 140, "Mỗi 4 mẩu = 320 ms âm thanh (16 ghế, 1 người nghe, bản cũ)", F_B, MUTED)
+    source(d, "profiler, 1 người dùng, 16 ghế, bản cũ · 54 ms = cộng thời gian mọi kernel GPU của codec trong trace")
+    x0, scale = 420, 740 / 320            # px per ms; 320 ms of audio = the real-time budget
+    text(d, 100, 145, "Mỗi lần gọi codec = 4 mẩu = 320 ms âm thanh", F_B, MUTED)
     d.line([x0, 185, x0, 470], fill=LINE, width=2)
     bx = x0 + 320 * scale
-    d.line([bx, 185, bx, 470], fill=mix(RED, appear(p, 0.1)), width=3)
-    text(d, bx, 474, "320 ms = vừa kịp real time", F_XS, mix(RED, appear(p, 0.1)), anchor="ma")
-    rows = [("Tạo 4 mẩu (CUDA graph)", 40, BLUE, "≈ 40 ms GPU", 0.18),
-            ("Codec: CPU ra lệnh", 182, ORANGE, "182 ms", 0.42),
-            ("Codec: GPU thật sự tính", 54, GREEN, "≈ 54 ms", 0.55)]
-    for i, (lab, ms, col, val, at) in enumerate(rows):
-        a = appear(p, at, at + 0.15)
+    d.line([bx, 185, bx, 470], fill=RED, width=3)
+    text(d, bx - 6, 474, "320 ms", F_XS, RED, anchor="ra")
+    rows = [("Model tạo 4 mẩu", 40, BLUE, "≈ 40 ms", 0), ("Codec: CPU bận", 182, ORANGE, "182 ms", 1),
+            ("Codec: GPU thật sự tính", 54, GREEN, "≈ 54 ms", 1)]
+    for i, (lab, ms, col, val, cue) in enumerate(rows):
+        a = 1.0 if ci > cue else (appear(Q, 0.1 + 0.3 * max(0, i - 1)) if ci == cue else 0)
         y = 205 + i * 85
         text(d, 100, y + 8, lab, F_B, mix(INK, a))
         hbar(d, x0, y, ms * scale, 46, col, a, value=val)
-    c = appear(p, 0.78)
-    ctext(d, W / 2, 530, "Nút thắt là codec, và codec đang bị CPU giữ chân (~2000 lệnh nhỏ mỗi lần gọi)", F_H, mix(RED, c))
-
-
-def s_ttfa(d, p, t, ci):
-    x0, scale = 100, 1080 / 170
-    text(d, x0, 150, "Thời gian ra tiếng đầu (phía server, 1 người): 167 ms", F_H)
-    parts = [("nạp câu (prefill)", 47, PURPLE), ("2 mẩu đầu", 19, BLUE), ("codec lần đầu", 103, ORANGE)]
-    x = x0
-    for i, (lab, ms, col) in enumerate(parts):
-        a = appear(p, 0.08 + 0.18 * i, 0.22 + 0.18 * i)
-        w = ms * scale * a
-        rbox(d, x, 230, max(4, w - 4), 80, mix(col, a), r=10)
-        if a > 0.5:
-            ctext(d, x + w / 2, 270, f"{ms} ms", F_H, (255, 255, 255))
-            ctext(d, x + ms * scale / 2, 340, lab, F_B, mix(col, a))
-        x += ms * scale
-    c = appear(p, 0.7)
-    ctext(d, W / 2, 440, "Một nửa chỉ để chờ codec giải mã lần đầu", F_H, mix(RED, c))
-
-
-def s_code(d, p, t, ci):
-    # left: one frame at a time, 12 layers each, then a host sync per seat
-    text(d, 100, 140, "Code cũ: giải mã từng mẩu một", F_H)
-    for k in range(4):
-        a = appear(p, 0.05 + 0.08 * k)
-        x = 100 + k * 135
-        rbox(d, x, 200, 110, 150, mix(tint(ORANGE, 0.14), a), outline=mix(ORANGE, a), r=12)
-        ctext(d, x + 55, 222, f"mẩu {k + 1}", F_S, mix(ORANGE, a))
-        for layer in range(12):
-            d.line([x + 14, 245 + layer * 8, x + 96, 245 + layer * 8], fill=mix(ORANGE, a * 0.5), width=3)
-        s = appear(p, 0.36 + 0.03 * k) if ci >= 1 else 0
-        for j in range(16):
-            cx = x + 8 + (j % 8) * 13
-            cy = 370 + (j // 8) * 16
-            d.ellipse([cx, cy, cx + 9, cy + 9], fill=mix(RED, s))
     if ci >= 1:
-        text(d, 100, 415, "chấm đỏ = hỏi độ dài từng ghế: CPU đứng chờ GPU", F_S, RED)
-    # right: the KV cache copied around every forward
-    c = appear(p, 0.7) if ci >= 2 else 0
-    rbox(d, 700, 200, 480, 220, mix((255, 255, 255), c), outline=mix(PURPLE, c), r=16)
-    ctext(d, 940, 232, "Bộ nhớ key value ≈ 400 MB", F_H, mix(PURPLE, c))
-    for i, s in enumerate(["nối", "cắt", "chọn", "chép lại", "…"]):
-        x = 720 + i * 92
-        rbox(d, x, 290, 80, 50, mix(tint(PURPLE, 0.16), c), outline=mix(PURPLE, c), r=10)
-        ctext(d, x + 40, 315, s, F_S, mix(PURPLE, c))
-    ctext(d, 940, 385, "mỗi lần tính, chép cả khối ~5 lượt", F_S, mix(MUTED, c))
+        ctext(d, W / 2, 530, "→ codec bị CPU giữ chân: GPU ngồi chờ lệnh", F_H, mix(RED, appear(Q, 0.6)))
+
+
+def s_flow(d, p, t, ci):
+    source(d, "cấu hình decoder của MOSS-Audio-Tokenizer-Nano (codec của VieNeu v3 Turbo)")
+    # input: 4 frames x 16 codes for one user
+    text(d, 70, 140, "Đầu vào (1 người, 1 lần gọi)", F_S, MUTED)
+    for f in range(4):
+        text(d, 70, 178 + f * 34, f"mẩu {f + 1}", F_XS, INK)
+        for k in range(16):
+            rbox(d, 140 + k * 13, 176 + f * 34, 11, 24, tint(BLUE, 0.35), outline=BLUE, r=2)
+    text(d, 70, 318, "16 số / mẩu, mỗi số 0–1023", F_XS, BLUE)
+    if ci >= 1:
+        arrow(d, 360, 230, 410, 230, MUTED, w=3, head=10)
+        rbox(d, 415, 190, 120, 80, tint(PURPLE, 0.14), outline=PURPLE, r=10)
+        ctext(d, 475, 218, "1 vector", F_S, PURPLE)
+        ctext(d, 475, 245, "768 số / mẩu", F_XS, MUTED)
+        arrow(d, 540, 230, 580, 230, MUTED, w=3, head=10)
+        for i, (n, layers, win, _) in enumerate(STAGES):
+            a = appear(Q, 0.15 + 0.12 * i)
+            y = 150 + i * 62
+            text(d, 590, y + 4, f"tầng {i + 1}", F_S, mix(INK, a))
+            cw = 320 / n
+            for k in range(n):
+                rbox(d, 680 + k * cw, y, max(3, cw - 2), 30, mix(tint(ORANGE, 0.3), a), outline=mix(ORANGE, a), r=2)
+            text(d, 1010, y + 4, f"{n} bước · {layers} lớp", F_XS, mix(INK, a))
+            text(d, 1010, y + 26, f"nhìn lại {win}", F_XS, mix(MUTED, a))
+        text(d, 680, 400, "1 mẩu được chia dần thành 4 → 8 → 16 → 32 bước thời gian", F_XS, ORANGE)
+    if ci >= 2:
+        arrow(d, 840, 430, 840, 470, MUTED, w=3, head=10)
+        wave(d, 690, 510, 300, 50, GREEN, phase=t * 3)
+        text(d, 1000, 490, "32 × 240 = 7680 mẫu", F_S, GREEN)
+        text(d, 1000, 518, "= 2 kênh × 3840 = 80 ms", F_S, GREEN)
+
+
+def s_seq(d, p, t, ci):
+    source(d, "trace một lần gọi codec: ~3500 phép tính nhỏ cho 4 mẩu · GPU có việc ≈ 54 / 182 ≈ 30% thời gian")
+    cpu, gpu = old_codec_lanes()
+    lanes(d, 200, 190, 960, cpu, gpu, title="Code cũ, một lần gọi codec:")
+    text(d, 200, 320, "cam = chạy cả 12 lớp cho 1 mẩu (~900 phép, CPU ra lệnh từng phép)", F_S, ORANGE)
+    text(d, 200, 355, "đỏ = đọc độ dài âm thanh về CPU → phải đợi GPU làm xong", F_S, RED)
+    if ci >= 1:
+        ctext(d, W / 2, 450, "4 lượt nối tiếp · GPU chỉ có việc ~30% thời gian", F_H, mix(RED, appear(Q, 0.4)))
+
+
+def s_kv(d, p, t, ci):
+    if ci == 0:
+        source(d, "mỗi lớp nhìn lại 500 / 800 / 1200 / 1600 bước tùy tầng (10 / 8 / 6 / 4 giây)")
+        text(d, 100, 145, "Một lớp ở tầng 4, một người dùng:", F_B)
+        n = 40
+        for k in range(n):
+            col = tint(PURPLE, 0.35) if k < n - 4 else ORANGE
+            rbox(d, 100 + k * 26, 200, 22, 60, col, r=4)
+        text(d, 100, 270, "← 1600 bước gần nhất (4 giây): key + value lưu sẵn = KV cache", F_S, PURPLE)
+        text(d, 100 + (n - 4) * 26, 270, "bước mới", F_S, ORANGE)
+        a = appear(Q, 0.4)
+        arrow(d, 100 + (n - 4) * 26, 320, 110, 320, mix(ORANGE, a), w=4, head=14)
+        ctext(d, 100 + (n - 4) * 13, 345, "bước mới nhìn lại tối đa 1600 bước (attention)", F_S, mix(ORANGE, a))
+        text(d, 100, 400, "Key/value của bước cũ đã lưu sẵn → không phải tính lại quá khứ.", F_B, mix(INK, a))
+        return
+    source(d, "ước tính: 16 ghế × 12 lớp × ~1000 bước × 512 số (256 key + 256 value) × 4 byte · ghi lại: đọc mã nguồn")
+    terms = [("16", "ghế"), ("12", "lớp"), ("~1000", "bước"), ("512", "số"), ("4", "byte")]
+    for i, (v, lab) in enumerate(terms):
+        x = 100 + i * 150
+        rbox(d, x, 150, 120, 90, (255, 255, 255), outline=PURPLE, r=12)
+        ctext(d, x + 60, 180, v, F_H, PURPLE)
+        ctext(d, x + 60, 218, lab, F_S, MUTED)
+        if i < 4:
+            ctext(d, x + 135, 195, "×", F_H, MUTED)
+    text(d, 860, 172, "≈ 400 MB", F_BIG, PURPLE)
+    text(d, 100, 285, "Code cũ, mỗi lớp, mỗi lượt:", F_B)
+    for i, s in enumerate(["1. nối bước mới vào", "2. cắt bỏ bước quá cũ", "3. chọn ghế được tính", "4. chép ngược về"]):
+        a = appear(Q, 0.15 + 0.12 * i)
+        x = 100 + i * 270
+        rbox(d, x, 330, 250, 60, mix(tint(RED, 0.10), a), outline=mix(RED, a), r=10)
+        ctext(d, x + 125, 360, s, F_S, mix(RED, a))
+    text(d, 100, 420, "= ghi lại toàn bộ cửa sổ 4 lần, dù chỉ thêm vài bước", F_H, mix(RED, appear(Q, 0.65)))
 
 
 def s_group(d, p, t, ci):
-    a = appear(p, 0.02)
-    text(d, 100, 140, "Trước: 4 lượt tính", F_H, mix(INK, a))
-    for k in range(4):
-        x = 100 + k * 150
-        rbox(d, x, 190, 120, 70, mix(tint(ORANGE, 0.15), a), outline=mix(ORANGE, a), r=12)
-        ctext(d, x + 60, 225, f"mẩu {k + 1}", F_S, mix(ORANGE, a))
-    b = appear(p, 0.3)
-    text(d, 100, 300, "Sau: 1 lượt tính cho cả 4 mẩu", F_H, mix(INK, b))
-    rbox(d, 100, 350, 570, 80, mix(tint(GREEN, 0.15), b), outline=mix(GREEN, b), r=14)
-    for k in range(4):
-        ctext(d, 170 + k * 140, 390, f"mẩu {k + 1}", F_S, mix(GREEN, b))
-    c = appear(p, 0.55) if ci >= 1 else 0
-    rbox(d, 740, 170, 440, 270, mix((255, 255, 255), c), outline=mix(LINE, c), r=16)
-    text(d, 765, 190, "Vì sao vẫn đúng?", F_H, mix(INK, c))
-    bullet_lines(d, 765, 245, ["Chỉ nhìn về quá khứ", "Cửa sổ nhìn lại có hạn", "Ghế khác: giữ nguyên trạng thái"],
-                 [c, appear(p, 0.65) if ci >= 1 else 0, appear(p, 0.75) if ci >= 1 else 0], f=F_B, dot=GREEN)
-    text(d, 765, 395, "→ cùng kết quả như tính từng mẩu", F_S, mix(GREEN, c))
+    x0, y0, cs = 120, 175, 62
+    text(d, x0, 140, "bước sau chỉ nhìn bước trước", F_S, MUTED)
+    for r in range(4):
+        text(d, x0 - 100, y0 + r * cs + 20, f"mẩu {r + 1}", F_XS, INK)
+        for c in range(4):
+            x, y = x0 + c * cs, y0 + r * cs
+            if c <= r:
+                rbox(d, x + 3, y + 3, cs - 6, cs - 6, tint(GREEN, 0.3), outline=GREEN, r=8)
+                ctext(d, x + cs / 2, y + cs / 2, CHECK, F_SYM, GREEN)
+            else:
+                rbox(d, x + 3, y + 3, cs - 6, cs - 6, tint(RED, 0.12), outline=RED, r=8)
+                ctext(d, x + cs / 2, y + cs / 2, CROSS, F_SYM, RED)
+    text(d, 470, 180, "Đưa cả 4 mẩu vào một lượt:", F_H)
+    text(d, 470, 225, "ô đỏ chặn mẩu trước nhìn mẩu sau,", F_B)
+    text(d, 470, 260, "nên ra đúng như chạy lần lượt từng mẩu.", F_B)
+    if ci >= 1:
+        rows = [("lượt chạy 12 lớp", "4", "1"), ("ghi lại cả cửa sổ KV", "16 lần", "4 lần"),
+                ("đọc độ dài về CPU", "mỗi mẩu", "bỏ (luôn 320 ms)")]
+        text(d, 470, 330, "", F_S)
+        text(d, 780, 330, "cũ", F_S, MUTED, anchor="ma")
+        text(d, 990, 330, "mới", F_S, GREEN, anchor="ma")
+        for i, (lab, old, new) in enumerate(rows):
+            a = appear(Q, 0.1 + 0.15 * i)
+            y = 365 + i * 50
+            text(d, 470, y, lab, F_B, mix(INK, a))
+            text(d, 780, y, old, F_B, mix(RED, a), anchor="ma")
+            text(d, 990, y, new, F_B, mix(GREEN, a), anchor="ma")
 
 
 def s_graph(d, p, t, ci):
-    a = appear(p, 0.02)
-    text(d, 100, 140, "Mỗi lần gọi codec bây giờ:", F_H, mix(INK, a))
-    x = 100
-    for i, s in enumerate(["chép mã", "chép độ dài", "chép mặt nạ ghế"]):
-        x += chip(d, x, 195, s, mix(BLUE, appear(p, 0.06 + 0.06 * i)), F_S) + 12
-    rbox(d, x + 10, 188, 64, 44, mix(GREEN, appear(p, 0.25)), r=10)
-    play_icon(d, x + 42, 210, 22, (255, 255, 255))
-    text(d, x + 90, 198, "1 lệnh phát lại", F_B, mix(GREEN, appear(p, 0.25)))
-    text(d, 100, 255, "Graph cho mỗi độ dài 1, 2, 3, 4 mẩu · CPU chỉ còn ~0,6 ms mỗi lần gọi", F_S, mix(MUTED, a))
-    if ci >= 1:
-        b = appear(p, 0.5)
-        rbox(d, 100, 300, 1080, 230, mix((255, 255, 255), b), outline=mix(LINE, b), r=16)
-        text(d, 125, 318, "Vì sao bản graph của tác giả ra âm thanh sai?", F_H, mix(INK, b))
-        k = 1 + int(seg(p, 0.55, 0.9) * 3.999)            # replays so far
-        rbox(d, 470, 370, 200, 70, mix(tint(ORANGE, 0.18), b), outline=mix(ORANGE, b), r=10)
-        ctext(d, 570, 393, "vùng nhớ output", F_XS, mix(MUTED, b))
-        ctext(d, 570, 418, f"đang chứa mẩu {k}", F_S, mix(ORANGE, b))
-        for j in range(k):
-            yy = 360 + j * 24
-            text(d, 140, yy, f"giữ mẩu {j + 1} →", F_S, mix(RED if j < k - 1 else INK, b))
-            arrow(d, 300, yy + 12, 465, 400, mix(LINE, b), w=2, head=8)
-        text(d, 140, 470, "mọi con trỏ trỏ vào cùng một chỗ: lần phát sau ghi đè lần trước", F_S, mix(RED, b))
-        c = appear(p, 0.82)
-        rbox(d, 780, 375, 370, 60, mix(tint(GREEN, 0.15), c), outline=mix(GREEN, c), r=10)
-        ctext(d, 965, 405, "bản mới: chép kết quả ra trước", F_S, mix(GREEN, c))
+    source(d, "182 / 54 ms: bản cũ (trace) · 1,3 / 32 ms: gom + CUDA graph, đo trong ablation, cùng 16 ghế")
+    cpu, gpu = old_codec_lanes()
+    lanes(d, 200, 170, 960, cpu, gpu, title="Trước: CPU bận 182 ms")
+    lanes(d, 200, 360, 960, [(0, 0.008, GREEN, None)], [(0.008, 0.008 + 32 / 182, BLUE, "4 mẩu")],
+          title="Sau (gom + CUDA graph): CPU ~1,3 ms, GPU ~32 ms")
+    text(d, 200, 475, "CUDA graph: ~900 phép của một lượt → 1 lệnh phát lại; GPU vẫn làm đủ việc", F_B, BLUE)
+
+
+def ring_cells(d, x, y, labels, written, cw=78, color=PURPLE, dim=()):
+    for k, lab in enumerate(labels):
+        w_on = k in written
+        fill = ORANGE if w_on else ((235, 236, 240) if k in dim else tint(color, 0.25))
+        rbox(d, x + k * (cw + 6), y, cw, 54, fill, outline=ORANGE if w_on else color, r=8)
+        ctext(d, x + k * (cw + 6) + cw / 2, y + 27, lab, F_S, (255, 255, 255) if w_on else INK)
 
 
 def s_ring(d, p, t, ci):
-    cx, cy, r, n = 900, 330, 170, 28
-    head = int(t * 6) % n
-    for i in range(n):
-        a0 = 2 * math.pi * i / n - math.pi / 2
-        a1 = 2 * math.pi * (i + 1) / n - math.pi / 2
-        age = (head - i) % n
-        col = PURPLE if age < 4 else (tint(PURPLE, 0.35) if age < n - 4 else LINE)
-        d.pieslice([cx - r, cy - r, cx + r, cy + r], math.degrees(a0), math.degrees(a1) - 1.5, fill=col)
-    d.ellipse([cx - r + 46, cy - r + 46, cx + r - 46, cy + r - 46], fill=BG)
-    ctext(d, cx, cy - 12, "vòng", F_H, PURPLE)
-    ctext(d, cx, cy + 22, "chỉ ghi vị trí mới", F_XS, MUTED)
-    a = appear(p, 0.02)
-    text(d, 100, 160, "Cách cũ", F_H, mix(RED, a))
-    text(d, 100, 205, "nối + cắt + chọn + chép lại cả khối", F_B, mix(INK, a))
-    text(d, 100, 245, "~5 lượt × ~400 MB mỗi lần tính", F_B, mix(MUTED, a))
-    b = appear(p, 0.25)
-    text(d, 100, 315, "Cách mới", F_H, mix(GREEN, b))
-    text(d, 100, 360, "ghi đúng vài vị trí mới vào vòng", F_B, mix(INK, b))
-    if ci >= 1:
-        c = appear(p, 0.6)
-        rbox(d, 100, 420, 600, 100, mix(tint(PURPLE, 0.10), c), outline=mix(PURPLE, c), r=14)
-        text(d, 125, 435, "Độ dài vòng = cửa sổ nhìn lại + 4 mẩu", F_B, mix(PURPLE, c))
-        text(d, 125, 475, "→ không ghi đè dữ liệu còn cần dùng", F_S, mix(MUTED, c))
+    if ci == 0:
+        text(d, 100, 140, "Cách cũ: cửa sổ giữ đúng thứ tự thời gian (ví dụ cửa sổ 8 bước)", F_B)
+        ring_cells(d, 100, 190, [f"b{k}" for k in range(1, 9)], set())
+        text(d, 100, 255, "trước", F_XS, MUTED)
+        a = appear(Q, 0.35)
+        if a > 0:
+            text(d, 820, 205, "+ b9, b10 mới", F_B, mix(ORANGE, a))
+            ring_cells(d, 100, 300, [f"b{k}" for k in range(3, 11)], set(range(8)) if a > 0.5 else set())
+            text(d, 100, 365, "sau: dời cả cửa sổ → ghi lại 8/8 ô", F_S, RED)
+        text(d, 100, 430, "Tầng 4: ghi lại cả 1600 bước, 4 lần mỗi lớp, mỗi lượt", F_H, mix(RED, appear(Q, 0.7)))
+        return
+    if ci == 1:
+        source(d, "độ dài vòng = cửa sổ + 4 mẩu; tầng 4: 1600 + 128 bước")
+        text(d, 100, 140, "Cách mới: mảng cố định 10 ô = cửa sổ 8 + 2 bước mới; ô = số thứ tự bước mod 10", F_B)
+        ring_cells(d, 100, 190, ["b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8", "b9", "b10"], set(), cw=70)
+        a = appear(Q, 0.35)
+        if a > 0:
+            text(d, 100, 260, "+ b11, b12 mới: ghi đè vào ô của b1, b2 (đã ra khỏi cửa sổ)", F_B, mix(ORANGE, a))
+            ring_cells(d, 100, 300, ["b11", "b12", "b3", "b4", "b5", "b6", "b7", "b8", "b9", "b10"],
+                       {0, 1} if a > 0.5 else set(), cw=70)
+            text(d, 100, 365, "chỉ ghi 2/10 ô, các ô khác giữ nguyên", F_S, GREEN)
+        return
+    source(d, "tầng 4, mỗi lần gọi codec (4 mẩu × 32 bước): cũ ghi lại cửa sổ 1600 bước, mới ghi 128 bước mới")
+    text(d, 100, 140, "Khi tính attention, thứ tự được tính lại từ số thứ tự bước:", F_B)
+    ring_cells(d, 100, 190, ["b11", "b12", "b3", "b4", "b5", "b6", "b7", "b8", "b9", "b10"], set(), cw=70,
+               dim={2, 3} if Q > 0.3 else ())
+    text(d, 100, 255, "b3, b4: quá 8 bước so với b12 → che đi (xám); kết quả y hệt cách cũ", F_S, MUTED)
+    rows = [("Ghi mỗi lần gọi (tầng 4)", "1600 bước × 4 lần", "128 bước mới")]
+    for i, (lab, old, new) in enumerate(rows):
+        y = 330
+        text(d, 100, y, lab, F_B)
+        text(d, 560, y, old, F_B, RED)
+        text(d, 900, y, new, F_B, GREEN)
+    text(d, 560, 300, "chưa có vòng (đã gom)", F_S, MUTED)
+    text(d, 900, 300, "mới", F_S, GREEN)
 
 
 def s_verify(d, p, t, ci):
-    a = appear(p, 0.02)
-    text(d, 100, 140, "Cùng một chuỗi mã → giải mã cách cũ và cách mới", F_H, mix(INK, a))
+    source(d, "CODEC_VERIFY=1 (chạy mỗi lần khởi động) · mẫu nghe so sánh: docs/samples/")
+    text(d, 100, 145, "Cùng một chuỗi mã → codec cũ và codec mới", F_H)
     for k, col in enumerate([BLUE, ORANGE]):
-        wave(d, 120, 260, 1040, 120, mix(col, a * (0.9 if k == 0 else 0.7)), phase=1.3, n=160, width=4 - k * 2)
-    text(d, 120, 330, "xanh = SDK gốc · cam = bản mới (trùng lên nhau)", F_S, mix(MUTED, a))
-    if ci >= 1:
-        checks = ["Dài 13 giây: vòng quay hết một lượt", "Người vào giữa chừng, người rời đi",
-                  "Số mẩu mỗi lần lẫn lộn"]
-        bullet_lines(d, 120, 385, checks, [appear(p, 0.5 + 0.08 * i) for i in range(3)], f=F_B, dot=GREEN)
-        c = appear(p, 0.8)
-        rbox(d, 760, 385, 400, 120, mix(tint(GREEN, 0.12), c), outline=mix(GREEN, c), r=16)
-        ctext(d, 960, 425, "tương quan", F_B, mix(MUTED, c))
-        ctext(d, 960, 470, "0,9999993", F_BIG, mix(GREEN, c))
-
-
-def s_hang(d, p, t, ci):
-    a = appear(p, 0.02)
-    rbox(d, 100, 160, 300, 90, mix(tint(BLUE, 0.12), a), outline=mix(BLUE, a), r=14)
-    ctext(d, 250, 205, "graph sinh âm", F_H, mix(BLUE, a))
-    rbox(d, 100, 300, 300, 90, mix(tint(ORANGE, 0.12), a), outline=mix(ORANGE, a), r=14)
-    ctext(d, 250, 345, "graph codec", F_H, mix(ORANGE, a))
-    fixed = ci >= 1 and p > 0.62
-    if not fixed:
-        rbox(d, 560, 230, 330, 90, mix(tint(RED, 0.12), a), outline=mix(RED, a), r=14)
-        ctext(d, 725, 262, "vùng nhớ tạm chung", F_B, mix(RED, a))
-        ctext(d, 725, 295, "(thư viện nhân ma trận)", F_XS, mix(MUTED, a))
-        arrow(d, 400, 205, 555, 255, mix(BLUE, a), w=4)
-        arrow(d, 400, 345, 555, 300, mix(ORANGE, a), w=4)
-        if int(t * 2) % 2 == 0:
-            ctext(d, 1030, 275, "TREO", F_BIG, mix(RED, a))
-        b = appear(p, 0.3)
-        rbox(d, 100, 430, 1080, 100, mix((32, 35, 40), b), r=12)
-        for i, ln in enumerate(["codec thread : ... audio.cpu()          ← đứng chờ GPU",
-                                "worker thread: ... torch.cuda.Event.record ← đứng chờ GPU"]):
-            text(d, 125, 448 + i * 34, ln, F_MONO, mix((230, 230, 230), b))
-    else:
-        c = ease(seg(p, 0.62, 0.75))
-        for y, col in ((205, BLUE), (345, ORANGE)):
-            rbox(d, 560, y - 40, 330, 80, mix(tint(col, 0.12), c), outline=mix(col, c), r=14)
-            ctext(d, 725, y, "vùng nhớ tạm riêng", F_B, mix(col, c))
-            arrow(d, 400, y, 555, y, mix(col, c), w=4)
-        ctext(d, 1040, 275, "hết treo", F_H, mix(GREEN, c))
-        text(d, 100, 450, "Sửa: mỗi graph codec được ghi trên stream riêng của nó", F_B, mix(INK, c))
+        wave(d, 120, 270, 1040, 120, mix(col, 0.9 if k == 0 else 0.7), phase=1.3, n=160, width=4 - k * 2)
+    text(d, 120, 340, "xanh = cũ · cam = mới (trùng lên nhau)", F_S, MUTED)
+    rbox(d, 380, 390, 520, 120, tint(GREEN, 0.12), outline=GREEN, r=16)
+    ctext(d, 640, 420, "tương quan (1 = trùng khít)", F_S, MUTED)
+    ctext(d, 640, 470, "0,9999993", F_BIG, GREEN)
 
 
 PARAMS = [
-    ("DECODE_FRAMES = 4", "mỗi lần tính đọc lại bộ nhớ mọi ghế → gom 4 mẩu cho rẻ; đoạn âm thanh vẫn chỉ 320 ms"),
-    ("LEADIN_FRAMES = 2", "người mới ra tiếng sau 2 mẩu; lần sớm này chỉ tính cho người mới"),
-    ("MAX_STREAMS = 16 / 32", "graph tính đủ mọi ghế, codec tốn theo số ghế → đặt bằng số người dự kiến"),
-    ("nhận ≤ 16 người / lượt", "một đợt 16 người vào cùng lúc chỉ cần 1 lần nạp câu"),
-    ("OVERLAP_CODEC = 1", "codec chạy song song: tổng thời gian tốt hơn, tiếng đầu chậm hơn khi dồn"),
+    ("4 mẩu mỗi lần gọi codec", "mỗi lượt đọc lại KV cache của mọi ghế → gom lại cho rẻ; mỗi đoạn vẫn chỉ 320 ms"),
+    ("người mới: sau 2 mẩu", "giải mã sớm để tiếng đầu ra nhanh; lần sớm này chỉ tính cho người mới"),
+    ("số ghế = số người dự kiến", "mỗi lượt luôn tính đủ mọi ghế, kể cả ghế trống"),
 ]
 
 
-PARAM_ROW = [0, 0, 1, 2, 3, 4]       # cue index -> highlighted row
-
-
 def s_params(d, p, t, ci):
-    ci = PARAM_ROW[ci]
     for i, (name, why) in enumerate(PARAMS):
-        if i > ci:                                     # rows appear with their cue
-            continue
-        on = i == ci
-        y = 140 + i * 82
-        rbox(d, 90, y, 1100, 70, tint(BLUE, 0.10) if on else (255, 255, 255), outline=BLUE if on else LINE, r=14)
-        text(d, 115, y + 22, name, F_B, BLUE if on else INK)
-        lines = wrap(why, F_S, 700, d)[:2]
+        a = appear(Q, 0.05 + 0.3 * i)
+        y = 160 + i * 110
+        rbox(d, 90, y, 1100, 90, mix((255, 255, 255), a), outline=mix(BLUE, a), r=14)
+        text(d, 115, y + 30, name, F_B, mix(BLUE, a))
+        lines = wrap(why, F_S, 620, d)[:2]
         for k, ln in enumerate(lines):
-            text(d, 470, y + (22 if len(lines) == 1 else 9 + k * 27), ln, F_S, INK if on else MUTED)
+            text(d, 540, y + (31 if len(lines) == 1 else 18 + k * 28), ln, F_S, mix(INK, a))
 
 
-def s_results(d, p, t, ci):
-    if ci == 0:
-        text(d, 100, 140, "RTF (thấp hơn = tốt hơn) · RTX 3060, cùng một máy, 16 ghế", F_B, MUTED)
-        groups = [("1 người", 0.40, 0.21), ("16 người", 0.53, 0.31)]
-        for g, (lab, old, new) in enumerate(groups):
-            y = 200 + g * 160
-            text(d, 100, y + 30, lab, F_H)
-            a, b = appear(p, 0.1 + 0.25 * g), appear(p, 0.2 + 0.25 * g)
-            hbar(d, 320, y, old * 1500, 44, MUTED, a, value=f"cũ {old:.2f}".replace(".", ","))
-            hbar(d, 320, y + 56, new * 1500, 44, GREEN, b, value=f"mới {new:.2f}".replace(".", ","))
-    else:
-        text(d, 100, 140, "32 ghế, 32 người dùng liên tục trong 3 phút", F_H)
-        stats = [("1824", "yêu cầu"), ("0", "lỗi"), ("305 ms", "tiếng đầu (trung vị)"), ("0,74", "RTF chậm nhất 1%")]
-        for i, (v, lab) in enumerate(stats):
-            a = appear(p, 0.55 + 0.07 * i)
-            x = 100 + i * 275
-            rbox(d, x, 220, 250, 190, mix((255, 255, 255), a), outline=mix(GREEN if i != 2 else BLUE, a), r=18)
-            ctext(d, x + 125, 295, v, F_BIG, mix(GREEN if i != 2 else BLUE, a))
-            ctext(d, x + 125, 365, lab, F_S, mix(MUTED, a))
-        ctext(d, W / 2, 470, "RTF < 1: mọi người đều nghe theo thời gian thực", F_B, mix(INK, appear(p, 0.85)))
+ABLATION = [   # lite/results/ablation-20261015/summary.json: (name, RTF 1, RTF 16, TTFA 1, TTFA 16, codec CPU / GPU)
+    ("Bản cũ", "0,40", "0,54", "124", "294", "—"),
+    ("+ gom mẩu", "0,21", "0,32", "111", "325", "40 ms / —"),
+    ("+ gom + graph", "0,21", "0,31", "88", "338", "1,3 / 32 ms"),
+    ("+ gom + vòng", "0,18", "0,29", "104", "340", "34 ms / —"),
+    ("+ cả ba", "0,175", "0,25", "76", "300", "1,2 / 22 ms"),
+]
+ABL_COLS = [("RTF 1 người", 470), ("RTF 16 người", 610), ("tiếng đầu, 1 người", 765), ("tiếng đầu, 16 người", 925),
+            ("codec CPU / GPU", 1090)]
+ABL_FOCUS = [({0, 1, 2}, {0, 2, 4}), ({2, 4}, {0, 1, 4}), ({0, 4}, {3})]          # per cue: (rows, cols)
+ABL_NOTE = ["gom: RTF 0,40 → 0,21 · graph: tiếng đầu 111 → 88 ms", "vòng: GPU 32 → 22 ms · cả ba: 0,175 / 0,25",
+            "đông người: tiếng đầu ≈ 300 ms, như bản cũ"]
 
 
-def s_quality(d, p, t, ci):
-    if ci == 0:
-        text(d, 100, 140, "5 câu mẫu · bản cũ và bản mới · cùng hạt giống ngẫu nhiên", F_B, MUTED)
-        for k, col in enumerate([BLUE, ORANGE]):
-            wave(d, 120, 280, 1040, 150, mix(col, 0.9 if k == 0 else 0.7), phase=0.4, n=180, width=4 - k * 2)
-        a = appear(p, 0.3)
-        rbox(d, 330, 400, 620, 110, mix(tint(GREEN, 0.12), a), outline=mix(GREEN, a), r=16)
-        ctext(d, 640, 435, "khác biệt nhỏ hơn tín hiệu ~1600 lần (SNR ≈ 64 dB)", F_B, mix(GREEN, a))
-        ctext(d, 640, 475, "mẫu nghe: docs/samples/", F_S, mix(MUTED, a))
-    else:
-        text(d, 100, 140, "Máy nhận dạng giọng nói (PhoWhisper) chấm lỗi ký tự · trung vị", F_H)
-        rows = [("Chạy riêng", "4,4 %", MUTED), ("Khi 32 người dùng cùng lúc", "1,8 %", GREEN)]
-        for i, (lab, v, col) in enumerate(rows):
-            a = appear(p, 0.5 + 0.12 * i)
-            y = 220 + i * 100
-            text(d, 120, y + 20, lab, F_H, mix(INK, a))
-            text(d, 900, y + 10, v, F_BIG, mix(col, a))
-        ctext(d, W / 2, 470, "Giọng trong video này: chính bản tối ưu đọc", F_H, mix(BLUE, appear(p, 0.8)))
-
-
-def s_summary(d, p, t, ci):
-    steps = [("Đo trước khi sửa (profiler)", INK), ("Đọc mã chỗ tốn nhất", ORANGE),
-             ("Sửa mà không đụng model", BLUE), ("Chứng minh âm thanh không đổi", GREEN),
-             ("Rồi mới đo tốc độ và độ ổn định", PURPLE)]
-    for i, (s, c) in enumerate(steps):
-        a = appear(p, i * 0.14, i * 0.14 + 0.14)
-        y = 150 + i * 74
-        d.ellipse([110, y, 160, y + 50], fill=mix(c, a))
-        ctext(d, 135, y + 25, str(i + 1), F_H, mix((255, 255, 255), a))
-        text(d, 185, y + 10, s, F_H, mix(INK, a))
+def s_ablation(d, p, t, ci):
+    source(d, "bật/tắt từng cách sửa trên cùng một máy RTX 3060, 16 ghế, trung vị 8 lượt mỗi mức; tiếng đầu tính bằng ms")
+    rows, cols = ABL_FOCUS[ci]
+    for name, x in ABL_COLS:
+        text(d, x, 140, name, F_XS, MUTED, anchor="ma")
+    for i, row in enumerate(ABLATION):
+        y = 175 + i * 64
+        rbox(d, 80, y, 1120, 54, tint(BLUE, 0.08) if i in rows else (255, 255, 255), outline=LINE, r=12)
+        text(d, 100, y + 15, row[0], F_B, INK if i in rows else MUTED)
+        for j, ((name, x), v) in enumerate(zip(ABL_COLS, row[1:])):
+            hot = i in rows and j in cols
+            text(d, x, y + 13, v, F_B if hot else F_S, BLUE if hot else (INK if i in rows else MUTED), anchor="ma")
+    text(d, 100, 505, ABL_NOTE[ci], F_H, RED if ci == 2 else GREEN)
 
 
 SCENES = [
     ("", "", s_title, [
-        "Video này kể lại cách tối ưu bản lite của VieNeu: vì sao biết phải sửa ở đâu, và các tham số được chọn theo logic nào.",
-    ]),
-    ("Nguyên tắc", "Không đụng vào model", s_principle, [
-        "Nguyên tắc đầu tiên: không đụng vào model. Trọng số, kiến trúc, kiểu số và cách chọn mã đều giữ nguyên.",
-        "Chỉ đổi cách giao việc cho GPU: gom việc, bỏ những lần chờ thừa, bỏ những lần copy thừa. Âm thanh phải ra y hệt.",
+        "Video này đi thẳng vào phần tối ưu codec của bản lite: đo, tìm chỗ chậm, sửa, rồi kiểm tra.",
     ]),
     ("Bước 1", "Đo trước khi sửa", s_measure, [
-        "Bước một là đo. Profiler ghi thời gian của từng phần, cả phía CPU lẫn phía GPU.",
-        "Cứ 4 mẩu là 320 mili giây âm thanh. Phần tạo mẩu bằng CUDA graph chỉ mất khoảng 40 mili giây.",
-        "Nhưng mỗi lần gọi codec, CPU mất 182 mili giây để ra lệnh, trong khi GPU chỉ thật sự tính khoảng 54 mili giây.",
-        "Kết luận: nút thắt không nằm ở model sinh âm, mà ở codec, và codec đang bị CPU giữ chân.",
+        "Profiler đo một lần gọi codec, tức 4 mẩu bằng 320 mili giây âm thanh. Model tạo 4 mẩu đó chỉ mất khoảng 40 mili giây.",
+        "Còn codec thì CPU bận 182 mili giây, trong khi GPU chỉ thật sự tính khoảng 54 mili giây. Nghĩa là codec bị CPU giữ chân.",
     ]),
-    ("Bước 1", "Tiếng đầu tiên mất bao lâu", s_ttfa, [
-        "Profiler còn tách thời gian ra tiếng đầu tiên: 167 mili giây, trong đó riêng lần gọi codec đầu đã mất 103 mili giây.",
+    ("Codec", "Codec nhận gì và làm gì", s_flow, [
+        "Đầu vào của codec: mỗi mẩu 80 mili giây, model sinh ra 16 con số cho mỗi người dùng. Mỗi lần gọi, codec nhận 4 mẩu như vậy.",
+        "Codec gộp 16 số của một mẩu thành một vector 768 số, rồi qua 4 tầng transformer, tổng cộng 12 lớp. Qua mỗi tầng, mẩu được chia nhỏ dần thành 4, 8, 16, rồi 32 bước thời gian.",
+        "Cuối cùng, mỗi bước cho ra 240 mẫu âm thanh. 32 bước là 7680 mẫu, chia cho 2 kênh, đúng 80 mili giây.",
     ]),
-    ("Bước 2", "Đọc mã nguồn chỗ tốn nhất", s_code, [
-        "Bước hai là đọc mã nguồn của codec. Hóa ra nó giải mã từng mẩu một, mỗi mẩu chạy qua mười hai lớp tính.",
-        "Sau mỗi mẩu, nó còn hỏi độ dài âm thanh của từng ghế, và mỗi lần hỏi lại bắt CPU đứng chờ GPU.",
-        "Thêm nữa, mỗi lần tính, nó chép cả bộ nhớ key value, khoảng 400 megabyte, qua lại nhiều lượt.",
+    ("Chỗ chậm 1", "Giải mã từng mẩu một", s_seq, [
+        "Code cũ chạy cả 12 lớp cho mẩu 1, đọc độ dài âm thanh về CPU, rồi mới tới mẩu 2. Lệnh đọc này bắt CPU đứng đợi GPU làm xong.",
+        "Mỗi lượt khoảng 900 phép tính nhỏ, CPU ra lệnh từng phép. Bốn lượt nối tiếp, nên GPU chỉ có việc khoảng 30 phần trăm thời gian.",
     ]),
-    ("Ý tưởng 1", "Gom cả 4 mẩu vào một lần tính", s_group, [
-        "Ý tưởng một: gom cả 4 mẩu vào chung một lần tính.",
-        "Cách này vẫn đúng, vì codec chỉ nhìn về quá khứ trong một cửa sổ có hạn. Các ghế không liên quan được giữ nguyên trạng thái.",
+    ("Chỗ chậm 2", "KV cache của codec", s_kv, [
+        "Mỗi lớp transformer chỉ nhìn lại một cửa sổ quá khứ, từ 4 tới 10 giây tùy tầng. Key và value của các bước trong cửa sổ được lưu sẵn, gọi là KV cache, để bước mới khỏi tính lại quá khứ.",
+        "Với 16 ghế, KV cache của codec khoảng 400 megabyte. Code cũ, mỗi lớp và mỗi lượt, ghi lại toàn bộ cửa sổ 4 lần: nối bước mới, cắt bước cũ, chọn ghế, rồi chép ngược về.",
     ]),
-    ("Ý tưởng 2", "CUDA graph cho codec", s_graph, [
-        "Ý tưởng hai: ghi lần tính của codec thành CUDA graph. Mỗi lần gọi chỉ còn vài lệnh chép và một lệnh phát lại.",
-        "Tác giả từng thử graph cho codec nhưng ra âm thanh sai, vì code cũ giữ con trỏ vào vùng nhớ mà lần phát sau ghi đè. Bản mới chép kết quả ra trước.",
+    ("Sửa 1", "Gom 4 mẩu vào một lượt", s_group, [
+        "Vì mỗi lớp chỉ nhìn về quá khứ, đưa cả 4 mẩu vào một lượt vẫn ra đúng như chạy lần lượt: mẩu trước không bao giờ thấy mẩu sau.",
+        "Một lượt thay cho bốn, nên cửa sổ KV chỉ bị ghi lại 4 lần thay vì 16. Và không cần đọc độ dài về nữa, vì 4 mẩu luôn là 320 mili giây.",
     ]),
-    ("Ý tưởng 3", "Bộ nhớ key value dạng vòng", s_ring, [
-        "Ý tưởng ba: thay việc chép cả bộ nhớ bằng một vòng tròn. Mỗi lần chỉ ghi vào chỗ của các vị trí mới.",
-        "Vòng dài bằng cửa sổ nhìn lại cộng thêm 4 mẩu, nên không bao giờ ghi đè lên dữ liệu còn cần dùng.",
+    ("Sửa 2", "CUDA graph", s_graph, [
+        "CUDA graph ghi lại khoảng 900 phép tính của một lượt thành một lệnh duy nhất. CPU của codec giảm xuống khoảng 1,3 mili giây mỗi lần gọi, GPU làm một mạch khoảng 32 mili giây.",
     ]),
-    ("Kiểm tra", "Đúng trước, nhanh sau", s_verify, [
-        "Trước khi đo tốc độ, phải chứng minh âm thanh không đổi: cùng một chuỗi mã được giải theo cách cũ và cách mới.",
-        "Chuỗi dài 13 giây, có người vào giữa chừng, có người rời đi. Hai kết quả tương quan gần như tuyệt đối.",
+    ("Sửa 3", "KV cache dạng vòng", s_ring, [
+        "Cách cũ giữ cửa sổ theo đúng thứ tự thời gian. Thêm bước mới thì phải dời cả cửa sổ, tức ghi lại mọi ô.",
+        "Cách mới dùng một mảng cố định, dài bằng cửa sổ cộng thêm 4 mẩu. Bước mới ghi đè vào ô của bước cũ nhất đã ra khỏi cửa sổ, các ô khác giữ nguyên.",
+        "Khi tính attention, thứ tự được tính lại từ số thứ tự bước, nên kết quả y hệt. Ở tầng 4, mỗi lần gọi chỉ ghi 128 bước mới, thay vì ghi lại cả cửa sổ 1600 bước.",
     ]),
-    ("Sự cố", "GPU bị treo khi hai graph chạy song song", s_hang, [
-        "Lần chạy đầu, GPU bị treo. Bộ canh treo in ra chỗ kẹt: cả hai luồng đều đứng chờ GPU.",
-        "Nhiều khả năng hai graph đã dùng chung một vùng nhớ tạm. Cho graph của codec ghi trên luồng riêng thì hết treo.",
+    ("Kiểm tra", "Âm thanh không đổi", s_verify, [
+        "Cùng một chuỗi mã cho qua codec cũ và codec mới: tương quan 0,9999993, nghe không khác.",
     ]),
-    ("Tham số", "Logic chọn tham số", s_params, [
-        "Gọi codec mỗi 4 mẩu, vì mỗi lần tính phải đọc lại bộ nhớ của mọi ghế, nên gom lại thì rẻ hơn.",
-        "Mà mỗi đoạn âm thanh gửi đi vẫn chỉ dài 320 mili giây.",
-        "Người mới được giải mã sớm sau 2 mẩu để tiếng đầu ra nhanh. Lần sớm này chỉ tính cho người mới, người cũ đợi tới mốc 4 mẩu.",
-        "Số ghế: graph luôn tính đủ mọi ghế, kể cả ghế trống, và codec càng nhiều ghế càng tốn. Nên đặt số ghế bằng số người dùng cùng lúc dự kiến.",
-        "Mỗi lượt nhận tối đa 16 người, để một đợt 16 người vào cùng lúc chỉ cần một lần nạp câu.",
-        "Codec chạy song song với việc sinh âm: tổng thời gian tốt hơn, nhưng khi nhiều người vào cùng lúc, tiếng đầu có thể chậm hơn.",
+    ("Tham số", "Chọn tham số", s_params, [
+        "Gọi codec mỗi 4 mẩu, vì mỗi lượt phải đọc lại KV cache của mọi ghế. Người mới được giải mã sớm sau 2 mẩu để tiếng đầu ra nhanh. Số ghế nên bằng số người dùng dự kiến, vì mỗi lượt luôn tính đủ mọi ghế.",
     ]),
-    ("Kết quả", "Nhanh hơn bao nhiêu", s_results, [
-        "Trên cùng một máy, với một người, hệ số thời gian thực giảm từ 0,40 xuống 0,21. Với 16 người, từ 0,53 xuống 0,31.",
-        "Với 32 ghế và 32 người dùng liên tục trong 3 phút: 1824 yêu cầu, không lỗi nào, ai cũng nghe theo thời gian thực.",
-    ]),
-    ("Chất lượng", "Âm thanh có đổi không?", s_quality, [
-        "Năm câu mẫu đọc bằng bản cũ và bản mới, cùng hạt giống ngẫu nhiên, ra âm thanh trùng nhau: phần khác biệt nhỏ hơn tín hiệu khoảng 1600 lần.",
-        "Khi tải nặng, máy nhận dạng giọng nói vẫn nghe đúng như lúc chạy riêng. Giọng trong video này cũng do chính bản tối ưu đọc.",
-    ]),
-    ("Tóm tắt", "Quy trình", s_summary, [
-        "Tóm lại: đo trước, đọc mã chỗ tốn nhất, sửa mà không đụng model, chứng minh âm thanh không đổi, rồi mới đo tốc độ và độ ổn định.",
+    ("Kết quả", "Mỗi cách sửa đóng góp bao nhiêu", s_ablation, [
+        "Đo từng phần trên cùng một máy: gom mẩu đưa hệ số thời gian thực từ 0,40 xuống 0,21. CUDA graph giữ hệ số gần như cũ, nhưng tiếng đầu nhanh hơn, từ 111 xuống 88 mili giây.",
+        "KV cache dạng vòng giảm việc GPU của codec từ 32 xuống 22 mili giây. Cả ba cộng lại: 0,175 với một người, 0,25 với 16 người.",
+        "Chưa cải thiện: khi 16 người vào cùng lúc, tiếng đầu vẫn khoảng 300 mili giây, phần lớn là chờ tới lượt và chờ nạp câu.",
     ]),
 ]
 
@@ -425,6 +412,8 @@ def render_frame(tl, now):
         if t0 <= now < t1 or (now >= t1 and t1 == tl[-1][1]):
             p = min(1.0, max(0.0, (now - t0) / (t1 - t0)))
             ci = next((i for i, (a, b, _) in enumerate(cues) if a <= now < b), len(cues) - 1)
+            global Q
+            Q = min(1.0, max(0.0, (now - cues[ci][0]) / (cues[ci][1] - cues[ci][0])))
             if title:
                 x = 60
                 if label:

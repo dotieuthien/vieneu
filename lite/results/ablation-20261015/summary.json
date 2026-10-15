@@ -1,0 +1,87 @@
+{
+  "host": "RTX-3060 12GB, South Korea, vkong vk_ea11a405dde1eaca, 2026-10-14 17:18-17:27 UTC",
+  "setup": "MAX_STREAMS=16, DECODE_FRAMES=4, LEADIN_FRAMES=2, OVERLAP_CODEC=1, WATERMARK=0; /benchmark on the GPU host, 8 measured bursts per level, p50 per request",
+  "configs": {
+    "A-head": {
+      "config": "HEAD (SDK codec)",
+      "c1": {
+        "n": 8,
+        "ttfa_ms_p50": 123.7,
+        "rtf_p50": 0.402
+      },
+      "c16": {
+        "n": 128,
+        "ttfa_ms_p50": 294.2,
+        "rtf_p50": 0.538
+      }
+    },
+    "B-group": {
+      "config": "gom (CODEC_GRAPHS=0 CODEC_RING=0)",
+      "c1": {
+        "n": 8,
+        "ttfa_ms_p50": 111.3,
+        "rtf_p50": 0.208,
+        "codec_call_host_ms_p50": 39.61,
+        "codec_call_gpu_span_ms_p50": 49.4
+      },
+      "c16": {
+        "n": 128,
+        "ttfa_ms_p50": 324.5,
+        "rtf_p50": 0.322,
+        "codec_call_host_ms_p50": 42.4,
+        "codec_call_gpu_span_ms_p50": 51.94
+      }
+    },
+    "C-ring": {
+      "config": "gom + ring (CODEC_GRAPHS=0 CODEC_RING=1)",
+      "c1": {
+        "n": 8,
+        "ttfa_ms_p50": 104.2,
+        "rtf_p50": 0.18,
+        "codec_call_host_ms_p50": 34.39,
+        "codec_call_gpu_span_ms_p50": 39.96
+      },
+      "c16": {
+        "n": 128,
+        "ttfa_ms_p50": 340.3,
+        "rtf_p50": 0.288,
+        "codec_call_host_ms_p50": 39.03,
+        "codec_call_gpu_span_ms_p50": 43.47
+      }
+    },
+    "D-graph": {
+      "config": "gom + graph (CODEC_GRAPHS=1 CODEC_RING=0)",
+      "c1": {
+        "n": 8,
+        "ttfa_ms_p50": 88.3,
+        "rtf_p50": 0.209,
+        "codec_call_host_ms_p50": 1.26,
+        "codec_call_gpu_span_ms_p50": 32.11
+      },
+      "c16": {
+        "n": 128,
+        "ttfa_ms_p50": 338.4,
+        "rtf_p50": 0.306,
+        "codec_call_host_ms_p50": 1.35,
+        "codec_call_gpu_span_ms_p50": 33.07
+      }
+    },
+    "E-graph-ring": {
+      "config": "gom + graph + ring (CODEC_GRAPHS=1 CODEC_RING=1)",
+      "c1": {
+        "n": 8,
+        "ttfa_ms_p50": 75.9,
+        "rtf_p50": 0.175,
+        "codec_call_host_ms_p50": 1.24,
+        "codec_call_gpu_span_ms_p50": 22.28
+      },
+      "c16": {
+        "n": 128,
+        "ttfa_ms_p50": 300.2,
+        "rtf_p50": 0.25,
+        "codec_call_host_ms_p50": 1.3,
+        "codec_call_gpu_span_ms_p50": 22.11
+      }
+    }
+  }
+}

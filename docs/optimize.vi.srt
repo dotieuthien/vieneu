@@ -1,128 +1,84 @@
 1
-00:00:00,000 --> 00:00:06,690
-Video này kể lại cách tối ưu bản lite của VieNeu: vì sao biết phải sửa ở đâu, và các tham số được chọn theo logic nào.
+00:00:00,000 --> 00:00:06,370
+Video này đi thẳng vào phần tối ưu codec của bản lite: đo, tìm chỗ chậm, sửa, rồi kiểm tra.
 
 2
-00:00:07,290 --> 00:00:12,700
-Nguyên tắc đầu tiên: không đụng vào model. Trọng số, kiến trúc, kiểu số và cách chọn mã đều giữ nguyên.
+00:00:06,970 --> 00:00:14,860
+Profiler đo một lần gọi codec, tức 4 mẩu bằng 320 mili giây âm thanh. Model tạo 4 mẩu đó chỉ mất khoảng 40 mili giây.
 
 3
-00:00:12,700 --> 00:00:19,390
-Chỉ đổi cách giao việc cho GPU: gom việc, bỏ những lần chờ thừa, bỏ những lần copy thừa. Âm thanh phải ra y hệt.
+00:00:14,860 --> 00:00:23,710
+Còn codec thì CPU bận 182 mili giây, trong khi GPU chỉ thật sự tính khoảng 54 mili giây. Nghĩa là codec bị CPU giữ chân.
 
 4
-00:00:19,990 --> 00:00:25,720
-Bước một là đo. Profiler ghi thời gian của từng phần, cả phía CPU lẫn phía GPU.
+00:00:24,310 --> 00:00:31,960
+Đầu vào của codec: mỗi mẩu 80 mili giây, model sinh ra 16 con số cho mỗi người dùng. Mỗi lần gọi, codec nhận 4 mẩu như vậy.
 
 5
-00:00:25,720 --> 00:00:31,610
-Cứ 4 mẩu là 320 mili giây âm thanh. Phần tạo mẩu bằng CUDA graph chỉ mất khoảng 40 mili giây.
+00:00:31,960 --> 00:00:44,330
+Codec gộp 16 số của một mẩu thành một vector 768 số, rồi qua 4 tầng transformer, tổng cộng 12 lớp. Qua mỗi tầng, mẩu được chia nhỏ dần thành 4, 8, 16, rồi 32 bước thời gian.
 
 6
-00:00:31,610 --> 00:00:39,900
-Nhưng mỗi lần gọi codec, CPU mất 182 mili giây để ra lệnh, trong khi GPU chỉ thật sự tính khoảng 54 mili giây.
+00:00:44,330 --> 00:00:52,460
+Cuối cùng, mỗi bước cho ra 240 mẫu âm thanh. 32 bước là 7680 mẫu, chia cho 2 kênh, đúng 80 mili giây.
 
 7
-00:00:39,900 --> 00:00:45,390
-Kết luận: nút thắt không nằm ở model sinh âm, mà ở codec, và codec đang bị CPU giữ chân.
+00:00:53,060 --> 00:01:01,270
+Code cũ chạy cả 12 lớp cho mẩu 1, đọc độ dài âm thanh về CPU, rồi mới tới mẩu 2. Lệnh đọc này bắt CPU đứng đợi GPU làm xong.
 
 8
-00:00:45,990 --> 00:00:54,120
-Profiler còn tách thời gian ra tiếng đầu tiên: 167 mili giây, trong đó riêng lần gọi codec đầu đã mất 103 mili giây.
+00:01:01,270 --> 00:01:09,480
+Mỗi lượt khoảng 900 phép tính nhỏ, CPU ra lệnh từng phép. Bốn lượt nối tiếp, nên GPU chỉ có việc khoảng 30 phần trăm thời gian.
 
 9
-00:00:54,720 --> 00:01:00,690
-Bước hai là đọc mã nguồn của codec. Hóa ra nó giải mã từng mẩu một, mỗi mẩu chạy qua mười hai lớp tính.
+00:01:10,080 --> 00:01:20,690
+Mỗi lớp transformer chỉ nhìn lại một cửa sổ quá khứ, từ 4 tới 10 giây tùy tầng. Key và value của các bước trong cửa sổ được lưu sẵn, gọi là KV cache, để bước mới khỏi tính lại quá khứ.
 
 10
-00:01:00,690 --> 00:01:07,060
-Sau mỗi mẩu, nó còn hỏi độ dài âm thanh của từng ghế, và mỗi lần hỏi lại bắt CPU đứng chờ GPU.
+00:01:20,690 --> 00:01:31,460
+Với 16 ghế, KV cache của codec khoảng 400 megabyte. Code cũ, mỗi lớp và mỗi lượt, ghi lại toàn bộ cửa sổ 4 lần: nối bước mới, cắt bước cũ, chọn ghế, rồi chép ngược về.
 
 11
-00:01:07,060 --> 00:01:12,630
-Thêm nữa, mỗi lần tính, nó chép cả bộ nhớ key value, khoảng 400 megabyte, qua lại nhiều lượt.
+00:01:32,060 --> 00:01:39,150
+Vì mỗi lớp chỉ nhìn về quá khứ, đưa cả 4 mẩu vào một lượt vẫn ra đúng như chạy lần lượt: mẩu trước không bao giờ thấy mẩu sau.
 
 12
-00:01:13,230 --> 00:01:16,400
-Ý tưởng một: gom cả 4 mẩu vào chung một lần tính.
+00:01:39,150 --> 00:01:47,680
+Một lượt thay cho bốn, nên cửa sổ KV chỉ bị ghi lại 4 lần thay vì 16. Và không cần đọc độ dài về nữa, vì 4 mẩu luôn là 320 mili giây.
 
 13
-00:01:16,400 --> 00:01:23,170
-Cách này vẫn đúng, vì codec chỉ nhìn về quá khứ trong một cửa sổ có hạn. Các ghế không liên quan được giữ nguyên trạng thái.
+00:01:48,280 --> 00:01:58,810
+CUDA graph ghi lại khoảng 900 phép tính của một lượt thành một lệnh duy nhất. CPU của codec giảm xuống khoảng 1,3 mili giây mỗi lần gọi, GPU làm một mạch khoảng 32 mili giây.
 
 14
-00:01:23,770 --> 00:01:29,980
-Ý tưởng hai: ghi lần tính của codec thành CUDA graph. Mỗi lần gọi chỉ còn vài lệnh chép và một lệnh phát lại.
+00:01:59,410 --> 00:02:05,300
+Cách cũ giữ cửa sổ theo đúng thứ tự thời gian. Thêm bước mới thì phải dời cả cửa sổ, tức ghi lại mọi ô.
 
 15
-00:01:29,980 --> 00:01:38,270
-Tác giả từng thử graph cho codec nhưng ra âm thanh sai, vì code cũ giữ con trỏ vào vùng nhớ mà lần phát sau ghi đè. Bản mới chép kết quả ra trước.
+00:02:05,300 --> 00:02:13,190
+Cách mới dùng một mảng cố định, dài bằng cửa sổ cộng thêm 4 mẩu. Bước mới ghi đè vào ô của bước cũ nhất đã ra khỏi cửa sổ, các ô khác giữ nguyên.
 
 16
-00:01:38,870 --> 00:01:44,840
-Ý tưởng ba: thay việc chép cả bộ nhớ bằng một vòng tròn. Mỗi lần chỉ ghi vào chỗ của các vị trí mới.
+00:02:13,190 --> 00:02:23,400
+Khi tính attention, thứ tự được tính lại từ số thứ tự bước, nên kết quả y hệt. Ở tầng 4, mỗi lần gọi chỉ ghi 128 bước mới, thay vì ghi lại cả cửa sổ 1600 bước.
 
 17
-00:01:44,840 --> 00:01:49,930
-Vòng dài bằng cửa sổ nhìn lại cộng thêm 4 mẩu, nên không bao giờ ghi đè lên dữ liệu còn cần dùng.
+00:02:24,000 --> 00:02:28,850
+Cùng một chuỗi mã cho qua codec cũ và codec mới: tương quan 0,9999993, nghe không khác.
 
 18
-00:01:50,530 --> 00:01:56,180
-Trước khi đo tốc độ, phải chứng minh âm thanh không đổi: cùng một chuỗi mã được giải theo cách cũ và cách mới.
+00:02:29,450 --> 00:02:40,700
+Gọi codec mỗi 4 mẩu, vì mỗi lượt phải đọc lại KV cache của mọi ghế. Người mới được giải mã sớm sau 2 mẩu để tiếng đầu ra nhanh. Số ghế nên bằng số người dùng dự kiến, vì mỗi lượt luôn tính đủ mọi ghế.
 
 19
-00:01:56,180 --> 00:02:01,910
-Chuỗi dài 13 giây, có người vào giữa chừng, có người rời đi. Hai kết quả tương quan gần như tuyệt đối.
+00:02:41,300 --> 00:02:52,390
+Đo từng phần trên cùng một máy: gom mẩu đưa hệ số thời gian thực từ 0,40 xuống 0,21. CUDA graph giữ hệ số gần như cũ, nhưng tiếng đầu nhanh hơn, từ 111 xuống 88 mili giây.
 
 20
-00:02:02,510 --> 00:02:08,160
-Lần chạy đầu, GPU bị treo. Bộ canh treo in ra chỗ kẹt: cả hai luồng đều đứng chờ GPU.
+00:02:52,390 --> 00:03:03,000
+KV cache dạng vòng giảm việc GPU của codec từ 32 xuống 22 mili giây. Cả ba cộng lại: 0,175 với một người, 0,25 với 16 người.
 
 21
-00:02:08,160 --> 00:02:13,890
-Nhiều khả năng hai graph đã dùng chung một vùng nhớ tạm. Cho graph của codec ghi trên luồng riêng thì hết treo.
-
-22
-00:02:14,490 --> 00:02:20,380
-Gọi codec mỗi 4 mẩu, vì mỗi lần tính phải đọc lại bộ nhớ của mọi ghế, nên gom lại thì rẻ hơn.
-
-23
-00:02:20,380 --> 00:02:24,030
-Mà mỗi đoạn âm thanh gửi đi vẫn chỉ dài 320 mili giây.
-
-24
-00:02:24,030 --> 00:02:30,880
-Người mới được giải mã sớm sau 2 mẩu để tiếng đầu ra nhanh. Lần sớm này chỉ tính cho người mới, người cũ đợi tới mốc 4 mẩu.
-
-25
-00:02:30,880 --> 00:02:38,530
-Số ghế: graph luôn tính đủ mọi ghế, kể cả ghế trống, và codec càng nhiều ghế càng tốn. Nên đặt số ghế bằng số người dùng cùng lúc dự kiến.
-
-26
-00:02:38,530 --> 00:02:43,540
-Mỗi lượt nhận tối đa 16 người, để một đợt 16 người vào cùng lúc chỉ cần một lần nạp câu.
-
-27
-00:02:43,540 --> 00:02:50,230
-Codec chạy song song với việc sinh âm: tổng thời gian tốt hơn, nhưng khi nhiều người vào cùng lúc, tiếng đầu có thể chậm hơn.
-
-28
-00:02:50,830 --> 00:02:59,840
-Trên cùng một máy, với một người, hệ số thời gian thực giảm từ 0,40 xuống 0,21. Với 16 người, từ 0,53 xuống 0,31.
-
-29
-00:02:59,840 --> 00:03:07,730
-Với 32 ghế và 32 người dùng liên tục trong 3 phút: 1824 yêu cầu, không lỗi nào, ai cũng nghe theo thời gian thực.
-
-30
-00:03:08,330 --> 00:03:16,540
-Năm câu mẫu đọc bằng bản cũ và bản mới, cùng hạt giống ngẫu nhiên, ra âm thanh trùng nhau: phần khác biệt nhỏ hơn tín hiệu khoảng 1600 lần.
-
-31
-00:03:16,540 --> 00:03:22,830
-Khi tải nặng, máy nhận dạng giọng nói vẫn nghe đúng như lúc chạy riêng. Giọng trong video này cũng do chính bản tối ưu đọc.
-
-32
-00:03:23,430 --> 00:03:30,840
-Tóm lại: đo trước, đọc mã chỗ tốn nhất, sửa mà không đụng model, chứng minh âm thanh không đổi, rồi mới đo tốc độ và độ ổn định.
+00:03:03,000 --> 00:03:09,690
+Chưa cải thiện: khi 16 người vào cùng lúc, tiếng đầu vẫn khoảng 300 mili giây, phần lớn là chờ tới lượt và chờ nạp câu.
 
