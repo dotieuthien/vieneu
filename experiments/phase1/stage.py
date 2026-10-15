@@ -1,7 +1,6 @@
 """Rebuild the exact code of a phase 1 experiment, one VKong project folder per variant.
 
-    python3 experiments/phase1/stage.py abba    /tmp/vieneu-phase1   # -> abba/{sdk,lite}
-    python3 experiments/phase1/stage.py overlap /tmp/vieneu-phase1   # -> overlap/{sdk,off,on}
+    python3 experiments/phase1/stage.py abba /tmp/p1   # -> /tmp/p1/abba/{sdk,lite}
 
 Code comes from commit 1ef70a3. The ABBA lite ran one step earlier, before the
 OVERLAP_CODEC option existed; abba-lite.patch takes that option back out.
@@ -36,16 +35,7 @@ EXPERIMENTS = {
         "sdk": ("baseline", None, "", "baseline/results/abba-20261013/block-1-slots-16"),
         "lite": ("lite", "abba-lite.patch", "", "lite/results/abba-20261013/block-2-slots-16"),
     },
-    "overlap": {
-        "sdk": ("baseline", None, "OVERLAP_CODEC=0", "baseline/results/overlap-20261013/block-1-baseline"),
-        "off": ("lite", None, "OVERLAP_CODEC=0", "lite/results/overlap-20261013/block-2-off"),
-        "on": ("lite", None, "OVERLAP_CODEC=1", "lite/results/overlap-20261013/block-3-on"),
-    },
 }
-# The overlap run started serve.py through bootstrap.py (pip install, then exec serve.py)
-# to work around a VKong setup problem at the time. It does not touch the timed path;
-# init_cmd does the install now, so it is not rebuilt.
-SKIPPED = {"bootstrap.py"}
 
 VKONG_YAML = """\
 type: service
@@ -92,8 +82,7 @@ def stage(experiment: str, out: Path) -> bool:
         (dst / "vkong.yaml").write_text(VKONG_YAML.format(app=APP, env=" ".join(filter(None, [COMMON, env])), tail=TAIL))
         (dst / ".vkongignore").write_text(VKONGIGNORE)
 
-        want = {k: v for k, v in json.loads((REPO / block / "bench-1.gpu.json").read_text())["source_sha256"].items()
-                if k not in SKIPPED}
+        want = json.loads((REPO / block / "bench-1.gpu.json").read_text())["source_sha256"]
         got = sources(dst)
         bad = [f"{name}: {'missing' if name not in got else 'not in the original run' if name not in want else 'different'}"
                for name in sorted(set(want) | set(got)) if want.get(name) != got.get(name)]

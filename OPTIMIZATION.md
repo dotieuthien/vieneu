@@ -1,7 +1,6 @@
 # Giai đoạn 2: đo rồi mới sửa (14–15/10/2026)
 
-Hết [giai đoạn 1](PHASE1.md), bản lite chạy ngang SDK gốc, và lần thử cho codec chạy song song cũng chỉ nhích một
-chút. Giai đoạn này đổi cách làm: chưa sửa gì cả, đo trước đã. Dưới đây là nhật ký kể theo đúng thứ tự đã làm: đo cái
+Hết [giai đoạn 1](PHASE1.md), bản lite chạy ngang SDK gốc. Giai đoạn này đổi cách làm: chưa sửa gì cả, đo trước đã. Dưới đây là nhật ký kể theo đúng thứ tự đã làm: đo cái
 gì, từ số đo đoán ra điều gì, sửa ra sao, kiểm tra thế nào, và dùng VKong ở từng bước. Có ghi cả những lần đi sai
 đường.
 

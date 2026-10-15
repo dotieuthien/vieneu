@@ -1,6 +1,6 @@
-"""Recompute the phase 1 tables in PHASE1.md from the raw per-request files.
+"""Recompute the phase 1 table in PHASE1.md from the raw per-request files.
 
-    python3 experiments/phase1/analyze.py                       # the committed 2026-10-13 run
+    python3 experiments/phase1/analyze.py                # the committed 2026-10-13 run
     python3 experiments/phase1/analyze.py --abba rerun   # your own rerun (PHASE1.md)
 
 Standard library only, no GPU. Inputs, per side (baseline = SDK, lite):
@@ -10,8 +10,8 @@ Standard library only, no GPU. Inputs, per side (baseline = SDK, lite):
 
 Method, as in phase 1: TTFA and RTF are taken per request, every block of a
 variant is pooled, and the median / p90 use linear interpolation at (n-1)*p.
-No median of medians. With --check, the committed report.json (ABBA) and
-summary.json (overlap) are compared against the recomputed values.
+No median of medians. With --check, the committed report.json is compared
+against the recomputed values.
 """
 import argparse
 import json
@@ -19,9 +19,6 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
 ABBA_LEVELS = [(1, 16), (4, 16), (8, 16), (16, 16), (32, 32)]   # (clients, slots)
-OVERLAP_LEVELS = [1, 16]
-OVERLAP_VARIANTS = [("baseline", "baseline", "SDK gốc"), ("lite", "off", "Lite, chạy tuần tự"),
-                    ("lite", "on", "Lite, codec chạy song song")]
 
 
 def q(xs, p):
@@ -109,45 +106,12 @@ def abba(exp: str, check: bool) -> bool:
     return ok
 
 
-def overlap(exp: str, check: bool) -> bool:
-    print(f"\n## Thử cho codec chạy song song ({exp})\n")
-    print("| Người dùng cùng lúc | Cấu hình | n | TTFA | RTF |\n|---:|---|---:|---:|---:|")
-    got = {}
-    for c in OVERLAP_LEVELS:
-        for side, name, label in OVERLAP_VARIANTS:
-            s = got[name, c] = stats(load(side, exp, f"block-*-{name}", c))
-            print(f"| {c} | {label} | {s['n']} | {ms(s['ttfa50'])} | {s['rtf50']:.3f} |")
-    ok = True
-    if check:
-        print()
-        for side in ("baseline", "lite"):
-            path = REPO / side / "results" / exp / "summary.json"
-            if not path.exists():
-                print(f"(không có {path.relative_to(REPO)} để đối chiếu)")
-                continue
-            for g in json.loads(path.read_text())["groups"]:
-                s = got[g["name"], g["c"]]
-                pairs = [("n", s["n"], g["n"]), ("ttfa p50", s["ttfa50"] / 1e3, g["ttfa_s"]["p50"]),
-                         ("ttfa p90", s["ttfa90"] / 1e3, g["ttfa_s"]["p90"]),
-                         ("rtf p50", s["rtf50"], g["rtf"]["p50"]), ("rtf p90", s["rtf90"], g["rtf"]["p90"])]
-                bad = [f"{k}: {a} != {b}" for k, a, b in pairs if abs(a - b) > 1e-6]
-                ok &= not bad
-                print(f"{path.relative_to(REPO)} {g['name']} c={g['c']}: {'khớp' if not bad else 'LỆCH ' + '; '.join(bad)}")
-    return ok
-
-
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--abba", default="abba-20261013", help="folder name under <side>/results/ ('' to skip)")
-    ap.add_argument("--overlap", default="", help="folder name under <side>/results/, e.g. overlap-20261013 (not in PHASE1.md)")
-    ap.add_argument("--check", action="store_true", help="compare with the committed report.json / summary.json")
+    ap.add_argument("--abba", default="abba-20261013", help="folder name under <side>/results/")
+    ap.add_argument("--check", action="store_true", help="compare with the committed report.json")
     a = ap.parse_args()
-    ok = True
-    if a.abba:
-        ok &= abba(a.abba, a.check)
-    if a.overlap:
-        ok &= overlap(a.overlap, a.check)
-    raise SystemExit(0 if ok else 1)
+    raise SystemExit(0 if abba(a.abba, a.check) else 1)
 
 
 if __name__ == "__main__":
