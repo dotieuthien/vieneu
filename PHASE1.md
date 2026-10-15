@@ -135,20 +135,22 @@ Mọi request đọc cùng một câu, dài khoảng 4 giây âm thanh, bằng g
 - Trước mỗi lượt: đặt lại seed thành 42 + số thứ tự lượt.
 - Chỉ một request lỗi là cả lần đo dừng. Lần này 1260/1260 request đều thành công.
 
-**Thứ tự A–B–B–A**
+**Thứ tự đo**
 
-Có 4 block theo thứ tự SDK → lite → lite → SDK, cùng trên một máy. Mỗi block deploy lại code bằng
-`vkong attach --update` (tức là khởi động lại server), rồi đo:
+Hai bản được đo xen kẽ trên cùng một máy, theo thứ tự SDK → lite → lite → SDK. Nếu máy nhanh chậm khác nhau theo thời
+gian thì cả hai bản đều chịu như nhau.
 
-| Người dùng cùng lúc | Số ghế | Lượt mỗi block | Request mỗi bản (2 block) |
-|---:|---:|---:|---:|
-| 1 | 16 | 15 | 30 |
-| 4 | 16 | 5 | 40 |
-| 8 | 16 | 5 | 80 |
-| 16 | 16 | 5 | 160 |
-| 32 | 32 | 5 | 320 |
+Số request được đo cho mỗi bản:
 
-Mức 32 người dùng đo sau khi khởi động lại server với 32 ghế. Tổng cộng mỗi bản có 630 request.
+| Người dùng cùng lúc | Số ghế | Số request |
+|---:|---:|---:|
+| 1 | 16 | 30 |
+| 4 | 16 | 40 |
+| 8 | 16 | 80 |
+| 16 | 16 | 160 |
+| 32 | 32 | 320 |
+
+Tổng cộng 630 request mỗi bản.
 
 **Thước đo**
 
@@ -163,9 +165,9 @@ Số này nằm trong `server-requests.jsonl`.
 
 **Thống kê**
 
-- Mỗi request là một mẫu. Mọi block của cùng một bản được gộp lại.
+- Mỗi request là một mẫu. Mọi request của cùng một bản được gộp lại.
 - Số trong bảng là trung vị, nội suy tuyến tính. Không lấy trung vị của các trung vị.
-- Mỗi bản chỉ có hai block, nên đây là so sánh mô tả, không phải kiểm định thống kê.
+- Mỗi bản chỉ được đo hai lần, nên đây là so sánh mô tả, không phải kiểm định thống kê.
 
 ### Lite so với SDK gốc
 
@@ -179,8 +181,8 @@ Số này nằm trong `server-requests.jsonl`.
 
 Số liệu:
 
-- SDK: [baseline/results/abba-20261013/](baseline/results/abba-20261013/) (block 1 và 4)
-- Lite: [lite/results/abba-20261013/](lite/results/abba-20261013/) (block 2 và 3)
+- SDK: [baseline/results/abba-20261013/](baseline/results/abba-20261013/)
+- Lite: [lite/results/abba-20261013/](lite/results/abba-20261013/)
 
 ### Giới hạn
 
@@ -200,18 +202,12 @@ Lệnh này in lại bảng ở trên, tính từ file đo thô:
 
 - Mỗi request đã đo là một dòng trong file `bench-<c>.jsonl`, với `c` là số người dùng cùng lúc.
 - Các file này nằm trong `baseline/results/abba-20261013/` (SDK) và `lite/results/abba-20261013/` (lite).
-- Mỗi thư mục `block-*` là một lần bật server.
 - Số trong bảng là trung vị của mọi dòng.
 
 ### Chạy lại trên VKong
 
-Cách làm:
-
-1. Thuê **một** máy, chạy SDK và đo.
-2. Đổi code sang lite ngay trên máy đó và đo tiếp.
-3. Lặp theo thứ tự SDK → lite → lite → SDK.
-
-Đo trên cùng một máy thì hai bản mới so được với nhau. Mất khoảng 30 phút máy, chi phí dưới $0.05.
+Cách làm: thuê **một** máy, đo SDK, rồi đổi code sang lite ngay trên máy đó và đo tiếp. Đo trên cùng một máy thì hai
+bản mới so được với nhau. Mất khoảng 30 phút máy, chi phí dưới $0.05.
 
 **Bước 1. Lấy đúng code lúc đo**
 
@@ -240,7 +236,7 @@ Lệnh `POST /benchmark` không tự đo. Nó bảo server chạy client đo nga
 
 ```bash
 URL=http://127.0.0.1:PORT
-OUT=baseline/results/abba-lan2/block-1-slots-16
+OUT=baseline/results/lan2/block-1-slots-16
 mkdir -p $OUT
 
 curl -X POST "$URL/benchmark?concurrency=1&repeats=15"   # bảo máy GPU bắt đầu đo 1 người dùng, 15 lượt
@@ -260,26 +256,27 @@ vkong attach vk_xxxx --update -C /tmp/p1/abba/lite
 
 - `--update` gửi thư mục `lite` lên đúng máy đó và bật lại server bằng code mới.
 - Thư viện đã cài ở bước 2 nên không cài lại.
-- Đo như bước 3, nhưng lưu vào `lite/results/abba-lan2/block-2-slots-16`.
+- Đo như bước 3, nhưng lưu vào `lite/results/lan2/block-2-slots-16`.
 
-**Bước 5. Đủ thứ tự SDK → lite → lite → SDK**
+**Bước 5. Đo thêm lite một lần, rồi SDK một lần**
 
 Làm lại bước 4 thêm hai lần:
 
-- Với `lite`, lưu vào `lite/results/abba-lan2/block-3-slots-16`.
-- Với `sdk`, lưu vào `baseline/results/abba-lan2/block-4-slots-16`.
+- Với `lite`, lưu vào `lite/results/lan2/block-3-slots-16`.
+- Với `sdk`, lưu vào `baseline/results/lan2/block-4-slots-16`.
 
-Để đo thêm mức 32 người dùng với 32 ghế:
+Mỗi lần đo, sau mức 16 người dùng, đo thêm mức 32 người dùng với 32 ghế:
 
 1. Sửa `MAX_STREAMS=16` thành `MAX_STREAMS=32` trong dòng `start` của `vkong.yaml`.
 2. Chạy lại `vkong attach ... --update`.
-3. Đo `concurrency=32&repeats=5`, lưu vào `block-<n>-slots-32`.
+3. Đo `concurrency=32&repeats=5`, lưu vào thư mục cùng tên nhưng đổi `slots-16` thành `slots-32`.
+4. Sửa lại `MAX_STREAMS=16` trước lần đo tiếp theo.
 
 **Bước 6. Trả máy và tính bảng**
 
 ```bash
 vkong app stop vieneu-phase1 --yes        # Ctrl+C không trả máy; máy tính tiền tới khi stop
-python3 experiments/phase1/analyze.py --abba abba-lan2
+python3 experiments/phase1/analyze.py --abba lan2
 ```
 
 **Lưu ý**
