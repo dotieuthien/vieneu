@@ -103,7 +103,7 @@ benchmark_host=00e188f076e2 server_pid=647 base=http://127.0.0.1:8000
 
 Hai bản chạy trên cùng một máy thuê, cùng container và cùng GPU:
 
-| | |
+| Thông số | Giá trị |
 |---|---|
 | GPU | NVIDIA GeForce RTX 3060, driver 595.104.02, giới hạn công suất 120 W |
 | GPU UUID | `GPU-6f4f1fdb-b8d6-e268-3730-8d9b7edd0919` |
