@@ -1,8 +1,8 @@
-# Giai đoạn 1: hiểu VieNeu và viết lại bản lite (13/10/2026)
+# Giai đoạn 1: hiểu VieNeu và tạo bản lite bằng agent (13/10/2026)
 
 VieNeu-TTS v3 Turbo là một model nhỏ, vậy mà đọc tiếng Việt kịp theo thời gian thực cho nhiều người cùng lúc. Câu hỏi
-đầu tiên là: tốc độ đó đến từ đâu? Giai đoạn này đi tìm câu trả lời theo ba bước. Đọc code của tác giả. Viết lại một
-bản gọn để hiểu chắc từng phần. Rồi chạy cả hai bản trên GPU thuê để so.
+đầu tiên là: tốc độ đó đến từ đâu? Giai đoạn này đi tìm câu trả lời theo ba bước. Dùng agent đọc code của tác giả.
+Cho agent dựng một bản gọn từ chính code đó để hiểu chắc từng phần. Rồi chạy cả hai bản trên GPU thuê để so.
 
 ## VieNeu biến chữ thành tiếng như thế nào
 
@@ -28,8 +28,8 @@ Tốc độ nằm ở bước 3, 4 và 5, tức là ở cách server chạy mode
 
 - **[baseline](baseline/)** gọi thẳng SDK của tác giả (`Vieneu(...).infer_stream()`), chỉ bọc thêm một lớp HTTP có
   giới hạn số luồng.
-- **[lite](lite/)** viết lại phần streaming trên GPU cho đủ nhỏ để đọc hết trong một buổi. Bản này vẫn dùng SDK để
-  nạp model, codec, phonemizer và các giọng có sẵn.
+- **[lite](lite/)** là bản gọn do agent dựng từ code của tác giả, chỉ giữ phần streaming trên GPU, đủ nhỏ để đọc hết
+  trong một buổi. Bản này vẫn dùng SDK để nạp model, codec, phonemizer và các giọng có sẵn.
 
 Ở giai đoạn này, lite gồm ba file chính:
 
@@ -103,7 +103,7 @@ Vì vậy các số trên chỉ nói về câu ngắn gửi dồn cùng lúc. V�
 
 ## Rút ra, và vì sao có giai đoạn 2
 
-- **Viết lại cho gọn không làm nhanh hơn.** Lite chạy xấp xỉ SDK gốc ở mọi mức tải. Những thứ làm nên tốc độ (CUDA
+- **Bản gọn hơn không chạy nhanh hơn.** Lite chạy xấp xỉ SDK gốc ở mọi mức tải. Những thứ làm nên tốc độ (CUDA
   graph, nhiều người chung một lượt chạy, codec theo từng đoạn) đều là thiết kế của tác giả, và lite giữ nguyên chúng.
 - **Đoán thì khó trúng.** Cho codec chạy song song là một phép thử theo cảm giác. Cả câu xong sớm hơn một chút, nhưng
   tiếng đầu lại đến chậm hơn.

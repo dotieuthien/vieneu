@@ -10,9 +10,9 @@ quả về, rồi trả máy.
 
 ## Câu chuyện
 
-**Giai đoạn 1: hiểu và viết lại (13/10/2026).** Mình đọc code của tác giả để biết vì sao nó nhanh, rồi viết lại một
-bản gọn tên là lite. Đo trên cùng một GPU thì lite chạy ngang SDK gốc, không nhanh hơn. Tốc độ nằm ở thiết kế của tác
-giả, còn viết lại chỉ giúp code dễ đọc. Chi tiết: [PHASE1.md](PHASE1.md).
+**Giai đoạn 1: hiểu và tạo bản lite (13/10/2026).** Mình dùng agent đọc code của tác giả để hiểu vì sao nó nhanh,
+rồi cho agent dựng một bản gọn từ chính code đó, gọi là lite. Đo trên cùng một GPU thì lite chạy ngang SDK gốc, không
+nhanh hơn. Tốc độ nằm ở thiết kế của tác giả; bản lite chỉ giúp code dễ đọc hơn. Chi tiết: [PHASE1.md](PHASE1.md).
 
 **Giai đoạn 2: đo rồi mới sửa (14–15/10/2026).** Lần này mình không đoán nữa. Gắn profiler và đo trên GPU thật thì
 thấy phần tạo âm thanh đã nhanh, còn chỗ chậm là codec: mỗi lần gọi, CPU mất 182 ms để ra lệnh trong khi GPU chỉ cần
