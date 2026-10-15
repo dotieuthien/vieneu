@@ -163,10 +163,6 @@ Cả hai càng thấp càng tốt:
 Server cũng ghi TTFA phía server cho cùng các request đó, tính từ lúc handler nhận request đến chunk âm thanh đầu tiên.
 Số này nằm trong `server-requests.jsonl`.
 
-**Thống kê**
-
-Số trong bảng là P50 trên mọi request đã đo của mỗi bản.
-
 ### Lite so với SDK gốc
 
 | Người dùng cùng lúc | TTFA P50, SDK gốc | TTFA P50, lite | RTF P50, SDK gốc | RTF P50, lite |
