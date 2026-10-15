@@ -123,7 +123,9 @@ Hai bản dùng cùng cấu hình:
 - Gọi codec mỗi 4 mẩu, giải mã sớm sau 2 mẩu.
 - Tắt watermark, `OMP_NUM_THREADS=4`.
 
-Bản lite được đo là bản đầu tiên, khi codec còn chạy lần lượt ngay trong vòng lặp của model.
+Bản lite được đo là bản lite đầu tiên. Ở bản này, một luồng duy nhất vừa chạy model vừa gọi codec: cứ đủ 4 mẩu thì
+dừng tạo âm thanh để giải mã, giải mã xong mới tạo tiếp. Thư mục `lite/` hiện tại là bản sau giai đoạn 2, đã khác bản
+này.
 
 **Tải**
 
