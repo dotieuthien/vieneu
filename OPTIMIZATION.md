@@ -4,16 +4,69 @@ Hết [giai đoạn 1](PHASE1.md), bản lite chạy ngang SDK gốc. Giai đo�
 gì, từ số đo đoán ra điều gì, sửa ra sao, kiểm tra thế nào, và dùng VKong ở từng bước. Có ghi cả những lần đi sai
 đường.
 
-Kết quả cuối, đo trên cùng một máy RTX 3060 với 16 ghế (slot):
+Video tóm tắt: [docs/optimize.mp4](docs/optimize.mp4).
 
-| | RTF 1 người | RTF 16 người | Tiếng đầu (TTFA), 1 người | TTFA, 16 người vào cùng lúc |
-|---|---:|---:|---:|---:|
-| Bản cũ | 0.402 | 0.538 | 124 ms | 294 ms |
-| Bản tối ưu | **0.175** | **0.250** | **76 ms** | 300 ms |
+## Kết quả: bản tối ưu so với SDK gốc (16/10/2026)
 
-RTF là thời gian xử lý chia cho độ dài âm thanh. Dưới 1 thì người nghe không bị ngắt. Model được giữ nguyên: trọng
-số, kiến trúc, kiểu số và cách sampling đều không đổi. Âm thanh cũng không đổi: giải mã cùng một chuỗi mã thì tương
-quan 0.9999993. Video tóm tắt: [docs/optimize.mp4](docs/optimize.mp4).
+Đo đúng cách của giai đoạn 1 (xem [Phương pháp đo](PHASE1.md#phương-pháp-đo)), lần này với SDK gốc và lite đã tối ưu.
+Profiler tắt ở cả hai bản.
+
+| Người dùng cùng lúc | TTFA P50 / P90, SDK gốc | TTFA P50 / P90, bản tối ưu | RTF P50 / P90, SDK gốc | RTF P50 / P90, bản tối ưu |
+|---:|---:|---:|---:|---:|
+| 1 | 110.1 / 110.8 ms | **62.7 / 63.4 ms** | 0.476 / 0.480 | **0.162 / 0.167** |
+| 4 | 151.2 / 152.5 ms | **116.0 / 120.9 ms** | 0.510 / 0.525 | **0.184 / 0.191** |
+| 8 | 177.0 / 186.7 ms | **143.1 / 154.5 ms** | 0.533 / 0.548 | **0.196 / 0.202** |
+| 16 | 205.3 / 343.8 ms | 210.9 / **226.2 ms** | 0.591 / 0.607 | **0.217 / 0.224** |
+| 32 (32 ghế) | 494.9 / 672.5 ms | **411.6 / 458.5 ms** | 0.918 / 0.955 | **0.347 / 0.364** |
+
+- **RTF giảm 2.6–2.9 lần** ở mọi mức tải.
+- **Tiếng đầu với 1 người dùng:** 110 → 63 ms.
+- **16 người vào cùng lúc:** TTFA P50 ngang nhau, nhưng P90 giảm từ 344 xuống 226 ms.
+- **Âm thanh không đổi.** Model giữ nguyên: trọng số, kiến trúc, kiểu số và cách sampling. Codec mới được so với codec
+  gốc mỗi lần server khởi động (`CODEC_VERIFY=1`): tương quan 0.9999992, sai lệch lớn nhất 0.0105 trên thang ±1.
+
+Máy đo:
+
+| Thông số | Giá trị |
+|---|---|
+| GPU | NVIDIA GeForce RTX 3060 12 GB, driver 570.195.03, giới hạn công suất 170 W |
+| GPU UUID | `GPU-32502328-f35f-cbe2-bfa2-8cc40b1026c7` |
+| Container | `0b29687edbe8` |
+| Máy thuê | VKong `vk_b37c724fd417b0f8`, $0.078/giờ |
+| Code | commit `60d316a` |
+| Xung nhịp GPU | Không khóa được; 1837–1995 MHz trong lúc đo |
+| Nhiệt độ GPU | 35–55 °C trong lúc đo |
+
+Máy này khác máy của giai đoạn 1, nên số của SDK ở đây không giống bảng của giai đoạn 1.
+
+Số liệu:
+
+- SDK: [baseline/results/abba-20261016/](baseline/results/abba-20261016/)
+- Bản tối ưu: [lite/results/abba-20261016/](lite/results/abba-20261016/)
+
+## Profile trước và sau tối ưu
+
+Đo với 1 người dùng, bằng profiler của lite (`PROFILE=1`):
+
+| | Trước tối ưu | Sau tối ưu |
+|---|---:|---:|
+| Mỗi lần gọi codec: thời gian CPU | 182 ms | 1.2 ms |
+| Mỗi lần gọi codec: thời gian trên GPU | 183 ms | 22 ms |
+| Model phải chờ codec | 129 ms | 0 ms |
+| Tạo một mẩu cho mọi ghế | 11.8 ms | 9.1 ms |
+| GPU bận, trong 2 giây trace | 20% | 70% |
+| Tiếng đầu, đo phía server | 167 ms | 65 ms |
+
+"Trước" đo ngày 14/10 trên một máy khác (xem bước 2 bên dưới). "Sau" đo ngày 16/10 trên cùng máy với bảng ở trên.
+Số phía CPU phụ thuộc máy, nên chỉ nên so độ lớn.
+
+Mở trace bằng [Perfetto](https://ui.perfetto.dev): bấm Open trace file, chọn thẳng file `.json.gz`.
+
+- Trước: [profile-20261014/run2/trace-20261014-110031.json.gz](lite/results/profile-20261014/run2/trace-20261014-110031.json.gz)
+- Sau, 1 người dùng: [profile-20261016/trace-c1.json.gz](lite/results/profile-20261016/trace-c1.json.gz)
+- Sau, 16 người dùng: [profile-20261016/trace-c16.json.gz](lite/results/profile-20261016/trace-c16.json.gz)
+
+Bảng profiler đầy đủ nằm trong `profile-c1-notrace.txt` và `profile-c16-notrace.txt` của cùng thư mục.
 
 ## Vòng làm việc
 
@@ -301,6 +354,51 @@ Số liệu: [lite/results/ablation-20261015/](lite/results/ablation-20261015/),
   prefill vào CUDA graph theo nhóm độ dài, và ưu tiên lượt codec đầu tiên của người mới.
 - **Codec giờ bị giới hạn bởi GPU:** mỗi lượt luôn tính đủ mọi ghế, kể cả ghế trống. Có thể thử `CODEC_DTYPE=bf16`,
   nhưng phải đo lại chất lượng bằng ASR.
+
+## Kiểm tra và chạy lại phép so sánh với SDK
+
+**Kiểm tra số trong bảng (không cần GPU):**
+
+```bash
+python3 experiments/phase1/analyze.py --abba abba-20261016
+```
+
+**Chạy lại bench.** Làm theo [các bước chạy lại của giai đoạn 1](PHASE1.md#chạy-lại-trên-vkong), chỉ thay bước 1 bằng:
+
+```bash
+mkdir -p /tmp/p2 && git archive 60d316a baseline lite | tar -x -C /tmp/p2
+mv /tmp/p2/baseline /tmp/p2/sdk
+cp baseline/results/abba-20261016/block-1-slots-16/vkong-deployed.yaml /tmp/p2/sdk/vkong.yaml
+cp lite/results/abba-20261016/block-2-slots-16/vkong-deployed.yaml /tmp/p2/lite/vkong.yaml
+```
+
+Ở các bước sau, dùng `/tmp/p2/sdk` và `/tmp/p2/lite` thay cho `/tmp/p1/abba/sdk` và `/tmp/p1/abba/lite`, và tên App là
+`vieneu-phase2`.
+
+**Chạy lại profile.** Trên cùng máy, deploy lite với profiler bật:
+
+```bash
+mkdir -p /tmp/p2/lite-profile && cp -R /tmp/p2/lite/. /tmp/p2/lite-profile/
+cp lite/results/profile-20261016/vkong-deployed.yaml /tmp/p2/lite-profile/vkong.yaml   # có PROFILE=1, CODEC_VERIFY=1
+vkong attach vk_xxxx --update -C /tmp/p2/lite-profile
+```
+
+Rồi ở cửa sổ khác:
+
+```bash
+curl -X POST "$URL/benchmark?concurrency=1&repeats=15"   # tạo tải 1 người dùng ngay trên máy GPU
+curl "$URL/results/bench-1.log"                           # đợi tới khi có dòng "measured"
+curl -X POST "$URL/profile/reset"                         # bắt đầu cửa sổ đo
+curl "$URL/benchmark"                                     # hỏi lại tới khi thấy "running": false
+curl "$URL/profile" > profile-c1-notrace.txt              # bảng profiler
+
+curl -X POST "$URL/benchmark?concurrency=1&repeats=15"   # tạo tải lần nữa để trace
+curl -X POST "$URL/profile/trace?seconds=2"               # gọi khi bench-1.log đã có "measured"; in tên file
+curl -O "$URL/results/profile/<tên file>.json.gz"         # tải trace về, mở bằng ui.perfetto.dev
+```
+
+Làm lại với `concurrency=16&repeats=8` cho mức 16 người dùng. Kết quả kiểm tra codec nằm trong `curl "$URL/health"`, mục
+`codec_check`.
 
 ## Ghi chú khi làm với VKong
 

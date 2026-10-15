@@ -62,12 +62,14 @@ def abba(exp: str, check: bool) -> bool:
     print(f"## ABBA: SDK gốc vs lite ({exp})\n")
     sides = {side: {c: stats(load(side, exp, f"block-*-slots-{slots}", c)) for c, slots in ABBA_LEVELS}
              for side in ("baseline", "lite")}
-    print("| Người dùng cùng lúc | n mỗi bản | TTFA SDK gốc | TTFA lite | RTF SDK gốc | RTF lite |")
+    print("| Người dùng cùng lúc | n mỗi bản | TTFA P50 / P90, SDK gốc | TTFA P50 / P90, lite"
+          " | RTF P50 / P90, SDK gốc | RTF P50 / P90, lite |")
     print("|---:|---:|---:|---:|---:|---:|")
     for c, slots in ABBA_LEVELS:
         b, l = sides["baseline"][c], sides["lite"][c]
         label = f"{c} ({slots} ghế)" if slots != 16 else str(c)
-        print(f"| {label} | {b['n']}/{l['n']} | {ms(b['ttfa50'])} | {ms(l['ttfa50'])} | {b['rtf50']:.3f} | {l['rtf50']:.3f} |")
+        print(f"| {label} | {b['n']}/{l['n']} | {b['ttfa50']:.1f} / {b['ttfa90']:.1f} ms | {l['ttfa50']:.1f} / {l['ttfa90']:.1f} ms"
+              f" | {b['rtf50']:.3f} / {b['rtf90']:.3f} | {l['rtf50']:.3f} / {l['rtf90']:.3f} |")
 
     print("\nTTFA phía server (cùng request, đo trong handler), p50:\n")
     print("| Người dùng | SDK gốc | lite |\n|---:|---:|---:|")

@@ -192,7 +192,7 @@ Số liệu:
 python3 experiments/phase1/analyze.py
 ```
 
-Lệnh này in lại bảng ở trên, tính từ file đo thô:
+Lệnh này in lại bảng ở trên (kèm thêm P90), tính từ file đo thô:
 
 - Mỗi request đã đo là một dòng trong file `bench-<c>.jsonl`, với `c` là số người dùng cùng lúc.
 - Các file này nằm trong `baseline/results/abba-20261013/` (SDK) và `lite/results/abba-20261013/` (lite).
