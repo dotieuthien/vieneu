@@ -165,13 +165,11 @@ Số này nằm trong `server-requests.jsonl`.
 
 **Thống kê**
 
-- Mỗi request là một mẫu. Mọi request của cùng một bản được gộp lại.
-- Số trong bảng là trung vị, nội suy tuyến tính. Không lấy trung vị của các trung vị.
-- Mỗi bản chỉ được đo hai lần, nên đây là so sánh mô tả, không phải kiểm định thống kê.
+Số trong bảng là P50 trên mọi request đã đo của mỗi bản.
 
 ### Lite so với SDK gốc
 
-| Người dùng cùng lúc | TTFA SDK gốc | TTFA lite | RTF SDK gốc | RTF lite |
+| Người dùng cùng lúc | TTFA P50, SDK gốc | TTFA P50, lite | RTF P50, SDK gốc | RTF P50, lite |
 |---:|---:|---:|---:|---:|
 | 1 | 127.0 ms | 129.1 ms | 0.529 | 0.548 |
 | 4 | 174.4 ms | 173.6 ms | 0.568 | 0.568 |
@@ -202,7 +200,7 @@ Lệnh này in lại bảng ở trên, tính từ file đo thô:
 
 - Mỗi request đã đo là một dòng trong file `bench-<c>.jsonl`, với `c` là số người dùng cùng lúc.
 - Các file này nằm trong `baseline/results/abba-20261013/` (SDK) và `lite/results/abba-20261013/` (lite).
-- Số trong bảng là trung vị của mọi dòng.
+- Số trong bảng là P50 của mọi dòng.
 
 ### Chạy lại trên VKong
 
