@@ -1,9 +1,0 @@
-First lite rental: vk_7a00a61629850500
-GPU snapshot before Vieneu model initialization, 2026-10-12 17:59:41 UTC:
-  NVIDIA GeForce RTX 3060, 12288 MiB total, 12029 MiB already used
-  GPU utilization 0%; no processes visible in this container
-  Driver 550.144.03, CUDA driver capability 12.4, power cap 110W
-Model load failed with torch.AcceleratorError: CUDA error: out of memory.
-attach --update reproduced the startup failure on the same rental.
-This failure occurred before the lite scheduler was constructed.
-No host or other users' processes were modified. Rental stopped as unusable.

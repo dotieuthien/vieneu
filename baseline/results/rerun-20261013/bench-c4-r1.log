@@ -1,3 +1,0 @@
-benchmark_host=c5553ff94ac0 server_pid=202 base=http://127.0.0.1:8000
-server: backend=pytorch max_streams=16 active=None
-4 client (4 ok, 0 lỗi/429): TTFA median 187 ms, max 191 ms | RTF max 0.59 (cần < 1) | 2.5s tổng

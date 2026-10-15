@@ -1,0 +1,25 @@
+START block=1 backend=baseline slots=16
+PREFLIGHT {"requested_mhz": 1500, "returncode": 4, "stdout": "The current user does not have permission to change clocks for GPU 00000000:0F:00.0.\nTerminating early due to previous errors.\n", "stderr": ""}
+DONE block=1 baseline slots=16 c=1 measured=3
+DONE block=1 baseline slots=16 c=16 measured=16
+START block=2 backend=off slots=16
+PREFLIGHT {"requested_mhz": 1500, "returncode": 4, "stdout": "The current user does not have permission to change clocks for GPU 00000000:0F:00.0.\nTerminating early due to previous errors.\n", "stderr": ""}
+DONE block=2 off slots=16 c=1 measured=3
+DONE block=2 off slots=16 c=16 measured=16
+START block=3 backend=on slots=16
+PREFLIGHT {"requested_mhz": 1500, "returncode": 4, "stdout": "The current user does not have permission to change clocks for GPU 00000000:0F:00.0.\nTerminating early due to previous errors.\n", "stderr": ""}
+DONE block=3 on slots=16 c=1 measured=3
+DONE block=3 on slots=16 c=16 measured=16
+START block=4 backend=on slots=16
+PREFLIGHT {"requested_mhz": 1500, "returncode": 4, "stdout": "The current user does not have permission to change clocks for GPU 00000000:0F:00.0.\nTerminating early due to previous errors.\n", "stderr": ""}
+DONE block=4 on slots=16 c=1 measured=3
+DONE block=4 on slots=16 c=16 measured=16
+START block=5 backend=off slots=16
+PREFLIGHT {"requested_mhz": 1500, "returncode": 4, "stdout": "The current user does not have permission to change clocks for GPU 00000000:0F:00.0.\nTerminating early due to previous errors.\n", "stderr": ""}
+DONE block=5 off slots=16 c=1 measured=3
+DONE block=5 off slots=16 c=16 measured=16
+START block=6 backend=baseline slots=16
+PREFLIGHT {"requested_mhz": 1500, "returncode": 4, "stdout": "The current user does not have permission to change clocks for GPU 00000000:0F:00.0.\nTerminating early due to previous errors.\n", "stderr": ""}
+DONE block=6 baseline slots=16 c=1 measured=3
+DONE block=6 baseline slots=16 c=16 measured=16
+COMPARISON COMPLETE: 114 measured requests, all succeeded

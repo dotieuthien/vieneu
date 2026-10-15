@@ -1,2 +1,0 @@
-server: backend=pytorch-lite max_streams=16 active=0
-32 client (32 ok, 0 lỗi/429): TTFA median 2174 ms, max 4773 ms | RTF max 2.06 (cần < 1) | 8.4s tổng
