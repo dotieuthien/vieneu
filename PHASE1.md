@@ -123,10 +123,6 @@ Hai bản dùng cùng cấu hình:
 - Gọi codec mỗi 4 mẩu, giải mã sớm sau 2 mẩu.
 - Tắt watermark, `OMP_NUM_THREADS=4`.
 
-Bản lite được đo là bản lite đầu tiên. Ở bản này, một luồng duy nhất vừa chạy model vừa gọi codec: cứ đủ 4 mẩu thì
-dừng tạo âm thanh để giải mã, giải mã xong mới tạo tiếp. Thư mục `lite/` hiện tại là bản sau giai đoạn 2, đã khác bản
-này.
-
 **Tải**
 
 Mọi request đọc cùng một câu, dài khoảng 4 giây âm thanh, bằng giọng mặc định Hải Đăng:
