@@ -1,0 +1,10 @@
+frame anatomy: one frame for all 16 slots (same cost whatever the occupancy)
+  eager: 1965 GPU ops, host 60.4 ms to launch them (31 us/op), GPU span 60.5 ms
+  graph: 1 launch, host 0.06 ms, GPU 8.9 ms; 2907 nodes, kernels 9.2 ms of a 9.3 ms span -> 0.2 ms of gaps between graph nodes (traced)
+  graph saves 51.6 ms per frame
+  sub-stages (eager, nested excluded; acoustic = decoder layers + embeddings + EOS head, backbone = without attention, eager = bookkeeping + input embeds):
+    frame.eager         131 ops     0.33 ms kernels ( 5.1%)    2.6 us/op
+    frame.acoustic     1041 ops     3.74 ms kernels (57.2%)    3.6 us/op
+    frame.sample         62 ops     0.15 ms kernels ( 2.4%)    2.5 us/op
+    frame.backbone      730 ops     2.22 ms kernels (33.9%)    3.0 us/op
+    frame.attn            1 ops     0.10 ms kernels ( 1.5%)   96.2 us/op

@@ -1,0 +1,538 @@
+  [debug] dial control
+  [debug] control session up
+→ Checking project
+✓ Project checked
+✓ Machine ready · vk_b37c724fd417b0f8
+→ Preparing the project
+✓ Project prepared · 9 files
+→ Starting the workload
+INFO:     Started server process [1646]
+INFO:     Waiting for application startup.
+BENCH GPU: {"before_load": [{"timestamp": "2026/10/15 18:40:59.380", "uuid": "GPU-32502328-f35f-cbe2-bfa2-8cc40b1026c7", "name": "NVIDIA GeForce RTX 3060", "driver_version": "570.195.03", "pstate": "P8", "utilization.gpu": "0", "memory.used": "4", "power.draw": "16.71", "power.limit": "170.00", "temperature.gpu": "39", "clocks.current.graphics": "210", "clocks.current.memory": "405"}, {"timestamp": "2026/10/15 18:41:00.428", "uuid": "GPU-32502328-f35f-cbe2-bfa2-8cc40b1026c7", "name": "NVIDIA GeForce RTX 3060", "driver_version": "570.195.03", "pstate": "P8", "utilization.gpu": "0", "memory.used": "4", "power.draw": "16.74", "power.limit": "170.00", "temperature.gpu": "39", "clocks.current.graphics": "210", "clocks.current.memory": "405"}, {"timestamp": "2026/10/15 18:41:01.475", "uuid": "GPU-32502328-f35f-cbe2-bfa2-8cc40b1026c7", "name": "NVIDIA GeForce RTX 3060", "driver_version": "570.195.03", "pstate": "P8", "utilization.gpu": "0", "memory.used": "4", "power.draw": "16.80", "power.limit": "170.00", "temperature.gpu": "39", "clocks.current.graphics": "210", "clocks.current.memory": "405"}, {"timestamp": "2026/10/15 18:41:02.524", "uuid": "GPU-32502328-f35f-cbe2-bfa2-8cc40b1026c7", "name": "NVIDIA GeForce RTX 3060", "driver_version": "570.195.03", "pstate": "P8", "utilization.gpu": "0", "memory.used": "4", "power.draw": "16.73", "power.limit": "170.00", "temperature.gpu": "39", "clocks.current.graphics": "210", "clocks.current.memory": "405"}, {"timestamp": "2026/10/15 18:41:03.590", "uuid": "GPU-32502328-f35f-cbe2-bfa2-8cc40b1026c7", "name": "NVIDIA GeForce RTX 3060", "driver_version": "570.195.03", "pstate": "P8", "utilization.gpu": "0", "memory.used": "4", "power.draw": "16.73", "power.limit": "170.00", "temperature.gpu": "39", "clocks.current.graphics": "210", "clocks.current.memory": "405"}], "idle_pass": true, "clock_lock": {"requested_mhz": 1500, "returncode": 4, "stdout": "The current user does not have permission to change clocks for GPU 00000000:03:00.0.\nTerminating early due to previous errors.\n", "stderr": ""}, "after_lock": {"timestamp": "2026/10/15 18:41:03.679", "uuid": "GPU-32502328-f35f-cbe2-bfa2-8cc40b1026c7", "name": "NVIDIA GeForce RTX 3060", "driver_version": "570.195.03", "pstate": "P8", "utilization.gpu": "0", "memory.used": "4", "power.draw": "16.73", "power.limit": "170.00", "temperature.gpu": "39", "clocks.current.graphics": "210", "clocks.current.memory": "405"}}
+Thu Oct 15 18:41:03 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 570.195.03             Driver Version: 570.195.03     CUDA Version: 12.8     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 3060        On  |   00000000:03:00.0 Off |                  N/A |
+|  0%   39C    P8             16W /  170W |       4MiB /  12288MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+2026-10-15 18:41:03,763 INFO Vieneu.V3Turbo: ⏳ Loading VieNeu-TTS v3 Turbo (PyTorch) from: pnnbao-ump/VieNeu-TTS-v3-Turbo/update ...
+2026-10-15 18:41:10,138 INFO Vieneu.V3Turbo: ✅ VieNeu-TTS v3 Turbo ready (backend=pytorch)
+2026-10-15 18:41:10,143 INFO Vieneu.V3Turbo: 📢 Loaded 25 preset voices (default: Hải Đăng)
+2026-10-15 18:41:12,532 INFO vieneu_lite.api: ready in 8.8s
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+✓ Workload running · http://127.0.0.1:64220
+✓ local app http://127.0.0.1:64220  (Ctrl+C to disconnect; machine stays)
+attach ok — tunnel :64220 → instance:8000 · service logs live
+INFO:     127.0.0.1:32994 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33010 - "POST /benchmark?concurrency=1&repeats=15 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33018 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33024 - "GET /benchmark HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33032 - "GET /benchmark HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33044 - "POST /benchmark/seed?seed=42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33048 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-15 18:41:22,408 INFO vieneu_lite.api: 9ea0f65875494c799a7145941cffe741 ttfa=79ms total=0.73s audio=4.24s rtf=0.17
+INFO:     127.0.0.1:33052 - "POST /benchmark/seed?seed=42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33068 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33072 - "GET /benchmark HTTP/1.1" 200 OK
+2026-10-15 18:41:23,080 INFO vieneu_lite.api: ab508ecb23444018bc6f5cc4d841c6a0 ttfa=59ms total=0.66s audio=4.08s rtf=0.16
+INFO:     127.0.0.1:54314 - "POST /benchmark/seed?seed=42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54318 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-15 18:41:23,752 INFO vieneu_lite.api: 8dac085f51f544d8838eeae83236726b ttfa=59ms total=0.66s audio=4.08s rtf=0.16
+INFO:     127.0.0.1:54334 - "POST /benchmark/seed?seed=43 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54348 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-15 18:41:24,376 INFO vieneu_lite.api: 23488e7948454defbede93dd86275a38 ttfa=58ms total=0.61s audio=3.84s rtf=0.16
+INFO:     127.0.0.1:54354 - "POST /benchmark/seed?seed=44 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54358 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-15 18:41:25,045 INFO vieneu_lite.api: 34b0f249d345437ca33bcb3dbc4d5ded ttfa=59ms total=0.66s audio=4.08s rtf=0.16
+INFO:     127.0.0.1:54368 - "POST /benchmark/seed?seed=45 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54384 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54390 - "GET /benchmark HTTP/1.1" 200 OK
+2026-10-15 18:41:25,717 INFO vieneu_lite.api: 160bed0a798d4062aab49c5a12e5c91c ttfa=59ms total=0.66s audio=4.16s rtf=0.16
+INFO:     127.0.0.1:54406 - "POST /benchmark/seed?seed=46 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54408 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-15 18:41:26,428 INFO vieneu_lite.api: 61e181f3768e492d9030d142a15b76ee ttfa=58ms total=0.70s audio=4.24s rtf=0.17
+INFO:     127.0.0.1:54422 - "POST /benchmark/seed?seed=47 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54430 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-15 18:41:27,098 INFO vieneu_lite.api: 9b96367224d94229a08027f95902671d ttfa=59ms total=0.66s audio=4.08s rtf=0.16
+INFO:     127.0.0.1:54444 - "POST /benchmark/seed?seed=48 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54450 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-15 18:41:27,760 INFO vieneu_lite.api: 69fcd5a08ee844a9bf6409253ef81ce4 ttfa=59ms total=0.65s audio=3.92s rtf=0.17
+INFO:     127.0.0.1:54452 - "POST /benchmark/seed?seed=49 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54460 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54474 - "GET /benchmark HTTP/1.1" 200 OK
+2026-10-15 18:41:28,383 INFO vieneu_lite.api: 1166b84928c8462997f4897f02655142 ttfa=58ms total=0.61s audio=3.84s rtf=0.16
+INFO:     127.0.0.1:54486 - "POST /benchmark/seed?seed=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54502 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-15 18:41:29,053 INFO vieneu_lite.api: 7cbe570f052842c0a4ebacf0ff48d79b ttfa=59ms total=0.66s audio=4.16s rtf=0.16
+INFO:     127.0.0.1:54506 - "POST /benchmark/seed?seed=51 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54508 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-15 18:41:29,724 INFO vieneu_lite.api: 8fc22c610cf64d9a88d665d9f45edff3 ttfa=59ms total=0.66s audio=4.16s rtf=0.16
+INFO:     127.0.0.1:54522 - "POST /benchmark/seed?seed=52 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54532 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-15 18:41:30,436 INFO vieneu_lite.api: 600cc783f69e42c6ad8de388ab860640 ttfa=59ms total=0.70s audio=4.24s rtf=0.17
+INFO:     127.0.0.1:54546 - "POST /benchmark/seed?seed=53 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54548 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54540 - "GET /benchmark HTTP/1.1" 200 OK
+2026-10-15 18:41:31,105 INFO vieneu_lite.api: 571abca3ba6a466aaebb6bcad47adcaa ttfa=58ms total=0.66s audio=4.08s rtf=0.16
+INFO:     127.0.0.1:54556 - "POST /benchmark/seed?seed=54 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54560 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-15 18:41:31,725 INFO vieneu_lite.api: dc12a969cc6e41cbab99851da7283f2c ttfa=58ms total=0.61s audio=3.84s rtf=0.16
+INFO:     127.0.0.1:54574 - "POST /benchmark/seed?seed=55 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54576 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-15 18:41:32,390 INFO vieneu_lite.api: 17e118ca13a84958a53cec51739f013e ttfa=59ms total=0.66s audio=4.08s rtf=0.16
+INFO:     127.0.0.1:54584 - "POST /benchmark/seed?seed=56 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54598 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-15 18:41:33,058 INFO vieneu_lite.api: 0a66407e404a4f8d8853fa2a541731a8 ttfa=59ms total=0.66s audio=4.16s rtf=0.16
+INFO:     127.0.0.1:43244 - "GET /benchmark HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43258 - "GET /results/bench-1.log HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43272 - "GET /results/bench-1.jsonl HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43288 - "GET /results/bench-1.gpu.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43290 - "POST /benchmark?concurrency=4&repeats=5 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43304 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43314 - "GET /benchmark HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43324 - "GET /benchmark HTTP/1.1" 200 OK
+2026-10-15 18:41:40,711 INFO vieneu_lite.api: 062c3585c6474f649b1da92b146a3f2e ttfa=141ms total=0.70s audio=3.76s rtf=0.19
+2026-10-15 18:41:40,758 INFO vieneu_lite.api: 2365c12a4bf34bda85c808af69a34414 ttfa=140ms total=0.75s audio=4.08s rtf=0.18
+2026-10-15 18:41:40,813 INFO vieneu_lite.api: 6a58db23b7f74c2183cc5eb81d1d0767 ttfa=143ms total=0.80s audio=4.32s rtf=0.19
+2026-10-15 18:41:40,813 INFO vieneu_lite.api: 942346f09e4947ffa952f7581d9b4ada ttfa=114ms total=0.80s audio=4.32s rtf=0.19
+INFO:     127.0.0.1:43376 - "POST /benchmark/seed?seed=42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43386 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43392 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43394 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43400 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43402 - "GET /benchmark HTTP/1.1" 200 OK
+2026-10-15 18:41:41,543 INFO vieneu_lite.api: 8b7ce11e59d048279ef1dba79aaf187d ttfa=107ms total=0.71s audio=4.08s rtf=0.17
+2026-10-15 18:41:41,580 INFO vieneu_lite.api: 4c3ae629ccd04e52bdfdc0306b79fb92 ttfa=91ms total=0.75s audio=4.24s rtf=0.18
+2026-10-15 18:41:41,581 INFO vieneu_lite.api: 31ab24dc3d69433e9584cbb26d702f6e ttfa=108ms total=0.75s audio=4.16s rtf=0.18
+2026-10-15 18:41:41,582 INFO vieneu_lite.api: e53b0883c233417e9b0d2e14c7f5bd38 ttfa=107ms total=0.75s audio=4.16s rtf=0.18
+INFO:     127.0.0.1:43404 - "POST /benchmark/seed?seed=42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43418 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43440 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43416 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43424 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-15 18:41:42,338 INFO vieneu_lite.api: 5a8c9175717846a597a29684b90355ed ttfa=109ms total=0.74s audio=3.84s rtf=0.19
+2026-10-15 18:41:42,339 INFO vieneu_lite.api: e5182791957d4dda9cf8d8108047e959 ttfa=92ms total=0.74s audio=4.16s rtf=0.18
+2026-10-15 18:41:42,340 INFO vieneu_lite.api: bc68284eb32441d789b848bea94f03c8 ttfa=109ms total=0.74s audio=4.00s rtf=0.18
+2026-10-15 18:41:42,371 INFO vieneu_lite.api: e1ee3061ab154e6f8027f42927b8667d ttfa=109ms total=0.77s audio=4.32s rtf=0.18
+INFO:     127.0.0.1:43444 - "POST /benchmark/seed?seed=43 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43446 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43448 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43462 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43478 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-15 18:41:43,124 INFO vieneu_lite.api: 3ec80899c6294fdc9d3a96029fd6cb65 ttfa=107ms total=0.74s audio=4.00s rtf=0.18
+2026-10-15 18:41:43,125 INFO vieneu_lite.api: 0526427970c04ff68abf3bd64e2cd4d2 ttfa=106ms total=0.74s audio=3.84s rtf=0.19
+2026-10-15 18:41:43,171 INFO vieneu_lite.api: 1f1417aa73a7462caaaaf4b2d0fdc3a2 ttfa=90ms total=0.78s audio=4.32s rtf=0.18
+2026-10-15 18:41:43,171 INFO vieneu_lite.api: f3e2041546b84f72a32311b7dae32a3f ttfa=106ms total=0.78s audio=4.40s rtf=0.18
+INFO:     127.0.0.1:47274 - "POST /benchmark/seed?seed=44 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47286 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47312 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47300 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47320 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47332 - "GET /benchmark HTTP/1.1" 200 OK
+2026-10-15 18:41:43,852 INFO vieneu_lite.api: 925edbe0ee1644448e3e12f47278b312 ttfa=91ms total=0.66s audio=3.84s rtf=0.17
+2026-10-15 18:41:43,902 INFO vieneu_lite.api: 76198cfdbd844c5997acef4fe468e4bd ttfa=108ms total=0.71s audio=3.84s rtf=0.19
+2026-10-15 18:41:43,902 INFO vieneu_lite.api: 6d43d6b5454d4321882ee59bd2376a7b ttfa=107ms total=0.71s audio=3.84s rtf=0.19
+2026-10-15 18:41:43,904 INFO vieneu_lite.api: d623e47077e24220b85a2245d0e12720 ttfa=108ms total=0.71s audio=3.92s rtf=0.18
+INFO:     127.0.0.1:47348 - "POST /benchmark/seed?seed=45 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47378 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47364 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47390 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47402 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-15 18:41:44,651 INFO vieneu_lite.api: 4e9d79d04ecf46858bcb13c2501ccd80 ttfa=111ms total=0.73s audio=4.00s rtf=0.18
+2026-10-15 18:41:44,652 INFO vieneu_lite.api: 7df2074e08fd43f4b89025aa561d46d2 ttfa=111ms total=0.73s audio=4.08s rtf=0.18
+2026-10-15 18:41:44,695 INFO vieneu_lite.api: 31b3f4bff49246cfb7f06c5033daf339 ttfa=94ms total=0.77s audio=4.24s rtf=0.18
+2026-10-15 18:41:44,695 INFO vieneu_lite.api: 9e7c29a736094e53a0024034d25feda8 ttfa=111ms total=0.77s audio=4.24s rtf=0.18
+INFO:     127.0.0.1:47418 - "POST /benchmark/seed?seed=46 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47466 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47440 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47456 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47430 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-15 18:41:45,390 INFO vieneu_lite.api: 48338d1d643f4af094fd0a193599809f ttfa=109ms total=0.68s audio=3.60s rtf=0.19
+2026-10-15 18:41:45,428 INFO vieneu_lite.api: 5e9eee71b1694c14b6c0a32b10083299 ttfa=109ms total=0.71s audio=4.00s rtf=0.18
+2026-10-15 18:41:45,429 INFO vieneu_lite.api: bd16e768723042ceb327bd6f842f2a8e ttfa=109ms total=0.71s audio=4.00s rtf=0.18
+2026-10-15 18:41:45,430 INFO vieneu_lite.api: a6541e5133fb40388f5b9651a290224b ttfa=92ms total=0.72s audio=4.08s rtf=0.18
+INFO:     127.0.0.1:47480 - "GET /benchmark HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47490 - "GET /results/bench-4.log HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47498 - "GET /results/bench-4.jsonl HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47500 - "GET /results/bench-4.gpu.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47508 - "POST /benchmark?concurrency=8&repeats=5 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47512 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47514 - "GET /benchmark HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47522 - "GET /benchmark HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49096 - "POST /benchmark/seed?seed=42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49110 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49098 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49158 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49124 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49136 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49164 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49142 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49118 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-15 18:41:54,211 INFO vieneu_lite.api: 529566b3d2b449f28818e010a4e14cea ttfa=143ms total=0.72s audio=3.68s rtf=0.20
+2026-10-15 18:41:54,267 INFO vieneu_lite.api: dd3d5d1774234965a92d1f9eb21072f8 ttfa=142ms total=0.78s audio=4.08s rtf=0.19
+2026-10-15 18:41:54,268 INFO vieneu_lite.api: f8bd170a08d9430eac5812a7f371d779 ttfa=144ms total=0.78s audio=3.92s rtf=0.20
+2026-10-15 18:41:54,311 INFO vieneu_lite.api: c10f4a0493644a5793b0e55f76928a92 ttfa=143ms total=0.82s audio=4.16s rtf=0.20
+2026-10-15 18:41:54,312 INFO vieneu_lite.api: 4e9bf27396844a399143a9d199e1ab5a ttfa=143ms total=0.82s audio=4.16s rtf=0.20
+2026-10-15 18:41:54,314 INFO vieneu_lite.api: 8f058cd9b0e24fe8a864cc06a4946f36 ttfa=144ms total=0.83s audio=4.16s rtf=0.20
+2026-10-15 18:41:54,314 INFO vieneu_lite.api: 6672cedb05bb4802bef7781ecf2e2380 ttfa=142ms total=0.83s audio=4.16s rtf=0.20
+2026-10-15 18:41:54,315 INFO vieneu_lite.api: 8d89096fa021480db52ee548a8f956e3 ttfa=124ms total=0.83s audio=4.32s rtf=0.19
+INFO:     127.0.0.1:49178 - "POST /benchmark/seed?seed=42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49200 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49202 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49210 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49224 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49240 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49192 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49260 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49252 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49266 - "GET /benchmark HTTP/1.1" 200 OK
+2026-10-15 18:41:55,029 INFO vieneu_lite.api: a23ae324f8ab47ac8146dead989cf9ac ttfa=131ms total=0.69s audio=3.76s rtf=0.18
+2026-10-15 18:41:55,115 INFO vieneu_lite.api: f1e185728eed429aa81091756a9901e1 ttfa=132ms total=0.78s audio=3.84s rtf=0.20
+2026-10-15 18:41:55,117 INFO vieneu_lite.api: 01e998999bf6402ca284af17aaf4d875 ttfa=130ms total=0.78s audio=4.08s rtf=0.19
+2026-10-15 18:41:55,118 INFO vieneu_lite.api: 94d0005a43df414da881558f80ead8d9 ttfa=131ms total=0.78s audio=3.92s rtf=0.20
+2026-10-15 18:41:55,119 INFO vieneu_lite.api: 368ceb4b8ebd4a5a9302dcf4a6c4e410 ttfa=130ms total=0.78s audio=4.00s rtf=0.20
+2026-10-15 18:41:55,152 INFO vieneu_lite.api: c1b426d4f6a043aa8fa6933fd32778c4 ttfa=130ms total=0.81s audio=4.16s rtf=0.20
+2026-10-15 18:41:55,152 INFO vieneu_lite.api: 3e29c31e30ad445897d8f2caec375c47 ttfa=113ms total=0.81s audio=4.24s rtf=0.19
+2026-10-15 18:41:55,153 INFO vieneu_lite.api: d17f1d22f35c49b792a3991dbb63ae99 ttfa=131ms total=0.82s audio=4.32s rtf=0.19
+INFO:     127.0.0.1:49274 - "POST /benchmark/seed?seed=42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49276 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49290 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49296 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49318 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49294 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49298 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49300 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49302 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-15 18:41:55,950 INFO vieneu_lite.api: 71bf671cf8154ae4baaa9925408c74e5 ttfa=113ms total=0.78s audio=3.92s rtf=0.20
+2026-10-15 18:41:55,953 INFO vieneu_lite.api: 028f74830955403c97091cbdfd171980 ttfa=130ms total=0.78s audio=4.00s rtf=0.19
+2026-10-15 18:41:55,954 INFO vieneu_lite.api: 116332bc706245dbba2a3fb918d86b93 ttfa=126ms total=0.77s audio=4.08s rtf=0.19
+2026-10-15 18:41:55,955 INFO vieneu_lite.api: 79623bcad5fc4ce387d8dfb24d431d01 ttfa=126ms total=0.78s audio=4.00s rtf=0.19
+2026-10-15 18:41:55,956 INFO vieneu_lite.api: 044706f322fe4e26b7f43b24edd74f13 ttfa=128ms total=0.78s audio=4.08s rtf=0.19
+2026-10-15 18:41:55,957 INFO vieneu_lite.api: f2cdb38345e14da4b61f6745de2b7e6c ttfa=126ms total=0.78s audio=3.92s rtf=0.20
+2026-10-15 18:41:55,973 INFO vieneu_lite.api: 23aa38f33e674d26a919c2d13290e70c ttfa=126ms total=0.79s audio=4.16s rtf=0.19
+2026-10-15 18:41:55,974 INFO vieneu_lite.api: cfabe69f347c4956a2d524aff1134126 ttfa=127ms total=0.80s audio=4.16s rtf=0.19
+INFO:     127.0.0.1:49322 - "POST /benchmark/seed?seed=43 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49330 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49360 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49346 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49332 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49370 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49376 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49380 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49396 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-15 18:41:56,685 INFO vieneu_lite.api: c511f9ad60f04cb4adabbee420e893f5 ttfa=128ms total=0.69s audio=3.76s rtf=0.18
+2026-10-15 18:41:56,686 INFO vieneu_lite.api: ead4fc605ee04724ad8d8c354b72e981 ttfa=128ms total=0.69s audio=3.76s rtf=0.18
+2026-10-15 18:41:56,760 INFO vieneu_lite.api: 1de779040a1648b9982084f42266ab5f ttfa=129ms total=0.76s audio=4.00s rtf=0.19
+2026-10-15 18:41:56,760 INFO vieneu_lite.api: 8b5f1f7e7dd9486283aeca356cad413a ttfa=111ms total=0.76s audio=3.92s rtf=0.19
+2026-10-15 18:41:56,761 INFO vieneu_lite.api: 4aa77d3db4bb4143932783f2ea12c618 ttfa=127ms total=0.76s audio=4.00s rtf=0.19
+2026-10-15 18:41:56,820 INFO vieneu_lite.api: 179d046846a04546ad8b65daea67a9d5 ttfa=128ms total=0.82s audio=4.24s rtf=0.19
+2026-10-15 18:41:56,820 INFO vieneu_lite.api: bbc84a7b8dcc4b0497bca319d099d554 ttfa=127ms total=0.82s audio=4.40s rtf=0.19
+2026-10-15 18:41:56,822 INFO vieneu_lite.api: b9667c33bdb647d6924f611f7789fdf2 ttfa=128ms total=0.82s audio=4.32s rtf=0.19
+INFO:     127.0.0.1:49406 - "POST /benchmark/seed?seed=44 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49500 - "GET /benchmark HTTP/1.1" 200 OK
+2026-10-15 18:41:57,552 INFO vieneu_lite.api: f1e943d82dea4eb4b3a57ef01d50b950 ttfa=127ms total=0.70s audio=3.68s rtf=0.19
+2026-10-15 18:41:57,622 INFO vieneu_lite.api: cbde9a951f4c4b749ff411d176f377ad ttfa=127ms total=0.77s audio=3.92s rtf=0.20
+2026-10-15 18:41:57,623 INFO vieneu_lite.api: 7b20e3f239dc4aed91c3fb4d6d61816e ttfa=129ms total=0.78s audio=4.00s rtf=0.19
+2026-10-15 18:41:57,624 INFO vieneu_lite.api: 96d0550841e645269447dca513dc65a8 ttfa=118ms total=0.78s audio=4.08s rtf=0.19
+2026-10-15 18:41:57,625 INFO vieneu_lite.api: 154688ba050a4bceae4118ba3f7cbf9b ttfa=129ms total=0.78s audio=4.00s rtf=0.19
+2026-10-15 18:41:57,663 INFO vieneu_lite.api: 9f2e769a08e049fda308f294f172e0b4 ttfa=128ms total=0.82s audio=4.16s rtf=0.20
+2026-10-15 18:41:57,664 INFO vieneu_lite.api: b08c6724ef2149fca10dab4cfc305436 ttfa=129ms total=0.82s audio=4.16s rtf=0.20
+2026-10-15 18:41:57,665 INFO vieneu_lite.api: 0c4f7e396ebe4ceaa52ea8001a3e4c45 ttfa=126ms total=0.82s audio=4.32s rtf=0.19
+INFO:     127.0.0.1:49516 - "POST /benchmark/seed?seed=45 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49524 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49566 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49538 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49546 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49554 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49552 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49590 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49574 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-15 18:41:58,421 INFO vieneu_lite.api: 5ba9ee95c3d847889e09d71f4ea91800 ttfa=129ms total=0.74s audio=4.16s rtf=0.18
+2026-10-15 18:41:58,488 INFO vieneu_lite.api: dc52a412d0064263b8761040866284ab ttfa=135ms total=0.80s audio=4.40s rtf=0.18
+2026-10-15 18:41:58,489 INFO vieneu_lite.api: c6f15eeb33af49638bcf6bf4e8773c77 ttfa=136ms total=0.80s audio=4.16s rtf=0.19
+2026-10-15 18:41:58,491 INFO vieneu_lite.api: d0393a031e5b4fe4a6c6b0eb813ce1ec ttfa=137ms total=0.80s audio=4.24s rtf=0.19
+2026-10-15 18:41:58,491 INFO vieneu_lite.api: 3132defe9d5f42a59bd58de266bed4a3 ttfa=136ms total=0.80s audio=4.24s rtf=0.19
+2026-10-15 18:41:58,493 INFO vieneu_lite.api: edca0d28bbe1468d93b05378d168d411 ttfa=137ms total=0.80s audio=4.40s rtf=0.18
+2026-10-15 18:41:58,494 INFO vieneu_lite.api: def83d51222247b6b754e7ab4a2758cf ttfa=134ms total=0.80s audio=4.40s rtf=0.18
+2026-10-15 18:41:58,495 INFO vieneu_lite.api: d1ea652378a64e20a33dfe34a533fcf4 ttfa=135ms total=0.80s audio=4.40s rtf=0.18
+INFO:     127.0.0.1:49604 - "POST /benchmark/seed?seed=46 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49622 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49606 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49636 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49624 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49656 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49662 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49672 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49644 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-15 18:41:59,204 INFO vieneu_lite.api: 7ffaaba7e9a04bedb652b5b1173f370e ttfa=108ms total=0.69s audio=3.84s rtf=0.18
+2026-10-15 18:41:59,284 INFO vieneu_lite.api: 714a89d5711b4601a804c93a41a9d752 ttfa=124ms total=0.76s audio=4.00s rtf=0.19
+2026-10-15 18:41:59,284 INFO vieneu_lite.api: c09aa3c8534f4a55a82281c1eb214145 ttfa=125ms total=0.77s audio=3.84s rtf=0.20
+2026-10-15 18:41:59,286 INFO vieneu_lite.api: 1ede4e0fc1b547efbb29b41a82d98214 ttfa=124ms total=0.76s audio=4.08s rtf=0.19
+2026-10-15 18:41:59,286 INFO vieneu_lite.api: aa9163e28d764fcba581378472c345a0 ttfa=123ms total=0.77s audio=3.92s rtf=0.20
+2026-10-15 18:41:59,288 INFO vieneu_lite.api: a005563cd924481388725e81f32b7ebe ttfa=124ms total=0.77s audio=4.08s rtf=0.19
+2026-10-15 18:41:59,289 INFO vieneu_lite.api: 925ca8cf4b0a4c799491daf2b43d7328 ttfa=123ms total=0.77s audio=4.08s rtf=0.19
+2026-10-15 18:41:59,290 INFO vieneu_lite.api: 2cbb9fe8c1ec4d519867e1aa918815c4 ttfa=108ms total=0.77s audio=4.08s rtf=0.19
+INFO:     127.0.0.1:49682 - "GET /benchmark HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49690 - "GET /results/bench-8.log HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49706 - "GET /results/bench-8.gpu.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49720 - "POST /benchmark?concurrency=16&repeats=5 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60744 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60754 - "GET /benchmark HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60760 - "GET /benchmark HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60764 - "POST /benchmark/seed?seed=42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60816 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60776 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60812 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60830 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60842 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60798 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60786 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60774 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60838 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60770 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60854 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60828 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60856 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60824 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60860 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60862 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-15 18:42:08,192 INFO vieneu_lite.api: 3f5f91dd86b848b2bce0187fcba487a3 ttfa=226ms total=0.82s audio=3.76s rtf=0.22
+2026-10-15 18:42:08,195 INFO vieneu_lite.api: a7232084050a435394a5daad61c62e13 ttfa=219ms total=0.81s audio=3.68s rtf=0.22
+2026-10-15 18:42:08,264 INFO vieneu_lite.api: 99ad7fe5467346fa91c585133ce6a6e7 ttfa=225ms total=0.89s audio=3.92s rtf=0.23
+2026-10-15 18:42:08,266 INFO vieneu_lite.api: bd5ff06e01064c93a9e24ae0ef58e1ad ttfa=222ms total=0.91s audio=4.00s rtf=0.23
+2026-10-15 18:42:08,268 INFO vieneu_lite.api: 94b120474f174b0cac69804270d22775 ttfa=226ms total=0.89s audio=3.92s rtf=0.23
+2026-10-15 18:42:08,270 INFO vieneu_lite.api: d1e1b6af53424b178ed39a16e2085145 ttfa=226ms total=0.90s audio=3.92s rtf=0.23
+2026-10-15 18:42:08,270 INFO vieneu_lite.api: 3b57158ba56c40cf8992aa424d8a3fa9 ttfa=215ms total=0.88s audio=3.92s rtf=0.22
+2026-10-15 18:42:08,271 INFO vieneu_lite.api: 5bbf8dee62f4432b826bdec60f69e254 ttfa=230ms total=0.90s audio=4.00s rtf=0.23
+2026-10-15 18:42:08,272 INFO vieneu_lite.api: b4a352723beb42cfac223c3d0b2a7011 ttfa=225ms total=0.90s audio=4.00s rtf=0.22
+2026-10-15 18:42:08,274 INFO vieneu_lite.api: fbc1b191603a4d028b4ab1584fe76ef5 ttfa=226ms total=0.90s audio=4.00s rtf=0.22
+2026-10-15 18:42:08,275 INFO vieneu_lite.api: 35aa3b5a811e45c896b42842c6f6e866 ttfa=221ms total=0.89s audio=4.08s rtf=0.22
+2026-10-15 18:42:08,276 INFO vieneu_lite.api: b52ea60be7b64f0f928d142736d62023 ttfa=219ms total=0.89s audio=3.92s rtf=0.23
+2026-10-15 18:42:08,319 INFO vieneu_lite.api: 9f219e2d78de484fa4ef30fe6d91356c ttfa=225ms total=0.94s audio=4.24s rtf=0.22
+2026-10-15 18:42:08,320 INFO vieneu_lite.api: e33c06b836e14078a7a2475d157d300f ttfa=216ms total=0.93s audio=4.16s rtf=0.22
+2026-10-15 18:42:08,321 INFO vieneu_lite.api: d1abb79438a04e1484fab07a778bd6be ttfa=214ms total=0.93s audio=4.24s rtf=0.22
+2026-10-15 18:42:08,323 INFO vieneu_lite.api: eb0a1d26e160433691991796e03becec ttfa=226ms total=0.95s audio=4.32s rtf=0.22
+INFO:     127.0.0.1:60872 - "POST /benchmark/seed?seed=42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60892 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60914 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60900 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60904 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60942 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60884 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60950 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60920 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60962 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60982 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60994 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60976 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60964 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60930 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32778 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32782 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32790 - "GET /benchmark HTTP/1.1" 200 OK
+2026-10-15 18:42:09,161 INFO vieneu_lite.api: c0d3872e1edb49089b6aa569bfd728b6 ttfa=208ms total=0.80s audio=3.76s rtf=0.21
+2026-10-15 18:42:09,162 INFO vieneu_lite.api: f43735415470440a88f51c2d2a51d8c9 ttfa=206ms total=0.79s audio=3.68s rtf=0.22
+2026-10-15 18:42:09,232 INFO vieneu_lite.api: 815c84220d344e8fb12efa94175dd9fb ttfa=214ms total=0.87s audio=4.08s rtf=0.21
+2026-10-15 18:42:09,234 INFO vieneu_lite.api: 1d7cf5399b4f42b1a39d03e804fc314d ttfa=208ms total=0.87s audio=4.08s rtf=0.21
+2026-10-15 18:42:09,235 INFO vieneu_lite.api: 1f2d2a4dee7d4118a73ce5f5601f21b8 ttfa=206ms total=0.87s audio=4.08s rtf=0.21
+2026-10-15 18:42:09,236 INFO vieneu_lite.api: 174c2825d189459eb3a111d1bb4ed289 ttfa=209ms total=0.87s audio=3.92s rtf=0.22
+2026-10-15 18:42:09,237 INFO vieneu_lite.api: fe592b476ae445d88037bf0c2fd0ddb9 ttfa=208ms total=0.87s audio=4.00s rtf=0.22
+2026-10-15 18:42:09,237 INFO vieneu_lite.api: fb82cfd8ce834e648cc8a47ba44f4b2f ttfa=207ms total=0.87s audio=4.08s rtf=0.21
+2026-10-15 18:42:09,239 INFO vieneu_lite.api: fc9e83eaf31a4b77b962b1babeef17c6 ttfa=208ms total=0.87s audio=4.08s rtf=0.21
+2026-10-15 18:42:09,240 INFO vieneu_lite.api: 13280aedae4c4bbe8a0e736bdb8cda0f ttfa=215ms total=0.88s audio=3.92s rtf=0.23
+2026-10-15 18:42:09,242 INFO vieneu_lite.api: bb616515f71a4825b7bb17992b7b0330 ttfa=206ms total=0.87s audio=4.00s rtf=0.22
+2026-10-15 18:42:09,243 INFO vieneu_lite.api: 18e3b1c18096405789a9ad88ea27a216 ttfa=212ms total=0.88s audio=4.00s rtf=0.22
+2026-10-15 18:42:09,287 INFO vieneu_lite.api: b14d2f57c58243ba879eb26cdaec38a8 ttfa=211ms total=0.94s audio=4.32s rtf=0.22
+2026-10-15 18:42:09,288 INFO vieneu_lite.api: 5462fdedc60b419a9ca6c7d58681a4ea ttfa=207ms total=0.92s audio=4.32s rtf=0.21
+2026-10-15 18:42:09,289 INFO vieneu_lite.api: 582af43bdcfc4f7fb6dcdc36058e3513 ttfa=208ms total=0.92s audio=4.16s rtf=0.22
+2026-10-15 18:42:09,290 INFO vieneu_lite.api: 08b978e2f99e47d3905e00bf150e79a1 ttfa=214ms total=0.93s audio=4.24s rtf=0.22
+INFO:     127.0.0.1:32800 - "POST /benchmark/seed?seed=42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32810 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32848 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32804 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32824 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32916 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32840 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32878 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32844 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32892 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32926 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32912 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32944 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32906 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32856 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32942 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32872 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-15 18:42:10,093 INFO vieneu_lite.api: ba53433d6f304a21b7a37caae48baa95 ttfa=181ms total=0.76s audio=3.68s rtf=0.21
+2026-10-15 18:42:10,175 INFO vieneu_lite.api: 49db32c1a20647e597b888b785ddc0dd ttfa=178ms total=0.86s audio=4.16s rtf=0.21
+2026-10-15 18:42:10,176 INFO vieneu_lite.api: 84325af76e3f4ffda3b0e5e0409c096b ttfa=180ms total=0.84s audio=4.08s rtf=0.21
+2026-10-15 18:42:10,177 INFO vieneu_lite.api: daed269eba844f08b8bbbf59ccd26414 ttfa=186ms total=0.85s audio=3.92s rtf=0.22
+2026-10-15 18:42:10,178 INFO vieneu_lite.api: e1a9f3c9301846e5b4c09c616e4b694e ttfa=181ms total=0.85s audio=4.08s rtf=0.21
+2026-10-15 18:42:10,179 INFO vieneu_lite.api: 04e9d3eb9ca243eaaed202aa04af5d36 ttfa=186ms total=0.85s audio=4.00s rtf=0.21
+2026-10-15 18:42:10,180 INFO vieneu_lite.api: c683a24dcf2844f5aa73e3dc0de650ad ttfa=183ms total=0.85s audio=4.08s rtf=0.21
+2026-10-15 18:42:10,181 INFO vieneu_lite.api: b46d77fccea040a19b5eb132e3418c89 ttfa=182ms total=0.85s audio=3.84s rtf=0.22
+2026-10-15 18:42:10,182 INFO vieneu_lite.api: 8dce432d37304984842f016fc03e6899 ttfa=196ms total=0.87s audio=3.92s rtf=0.22
+2026-10-15 18:42:10,183 INFO vieneu_lite.api: b9b1f151bd5e4f79a0f5226fb3778404 ttfa=182ms total=0.85s audio=4.00s rtf=0.21
+2026-10-15 18:42:10,184 INFO vieneu_lite.api: e55cf4e2e4e84566a974fb8d63b2eb6b ttfa=185ms total=0.86s audio=3.92s rtf=0.22
+2026-10-15 18:42:10,186 INFO vieneu_lite.api: 2f6e5f1d0f604fa8a8a965637aa4d8d4 ttfa=183ms total=0.85s audio=4.00s rtf=0.21
+2026-10-15 18:42:10,187 INFO vieneu_lite.api: 8b4942bb23e94e868a502432cb5e73f6 ttfa=180ms total=0.85s audio=3.84s rtf=0.22
+2026-10-15 18:42:10,224 INFO vieneu_lite.api: 74c51b2b510340b3acf37ff158017aa6 ttfa=180ms total=0.89s audio=4.16s rtf=0.21
+2026-10-15 18:42:10,224 INFO vieneu_lite.api: 3352958846d34cd2adbbffb644995b60 ttfa=180ms total=0.89s audio=4.24s rtf=0.21
+2026-10-15 18:42:10,225 INFO vieneu_lite.api: 1361eff473254b6db2af934270a31d5c ttfa=181ms total=0.89s audio=4.32s rtf=0.21
+INFO:     127.0.0.1:32946 - "POST /benchmark/seed?seed=43 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32948 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32984 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32970 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32964 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33004 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32968 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32954 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33028 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33016 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32966 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33046 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33060 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32988 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33044 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33012 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33066 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-15 18:42:11,012 INFO vieneu_lite.api: 84a6473f965440ee8634de917c8102d4 ttfa=174ms total=0.76s audio=3.84s rtf=0.20
+2026-10-15 18:42:11,015 INFO vieneu_lite.api: f720f99813964e88aead36cc416d6f12 ttfa=178ms total=0.75s audio=3.76s rtf=0.20
+2026-10-15 18:42:11,085 INFO vieneu_lite.api: dc5564c7074f4b288c5781673e8123de ttfa=177ms total=0.82s audio=3.84s rtf=0.21
+2026-10-15 18:42:11,086 INFO vieneu_lite.api: 94f2e927f3234348ad78146a24e1ea91 ttfa=178ms total=0.82s audio=3.84s rtf=0.21
+2026-10-15 18:42:11,087 INFO vieneu_lite.api: 0a8b45c27a334d5eb2a8554f14f26177 ttfa=176ms total=0.82s audio=3.84s rtf=0.21
+2026-10-15 18:42:11,088 INFO vieneu_lite.api: d9ba70322f4642b5b74578284cc4842c ttfa=183ms total=0.83s audio=4.08s rtf=0.20
+2026-10-15 18:42:11,089 INFO vieneu_lite.api: 357e8316cd224999ab6448956ac3d8e1 ttfa=183ms total=0.83s audio=4.08s rtf=0.20
+2026-10-15 18:42:11,090 INFO vieneu_lite.api: 9b76cd48dd0141d7a69edb936109ea0c ttfa=178ms total=0.82s audio=3.84s rtf=0.21
+2026-10-15 18:42:11,091 INFO vieneu_lite.api: ab28515a89f44e0897375eca493c9e7c ttfa=179ms total=0.82s audio=4.00s rtf=0.21
+2026-10-15 18:42:11,093 INFO vieneu_lite.api: 7695cd358c084823ba83524520a13aa6 ttfa=179ms total=0.83s audio=4.00s rtf=0.21
+2026-10-15 18:42:11,094 INFO vieneu_lite.api: dde9b57eea3a4260b4781b81114d7e6c ttfa=179ms total=0.83s audio=4.00s rtf=0.21
+2026-10-15 18:42:11,155 INFO vieneu_lite.api: 40fc739debf543feb44b769117702cfd ttfa=178ms total=0.89s audio=4.16s rtf=0.21
+2026-10-15 18:42:11,156 INFO vieneu_lite.api: 453a5127ff0d408c9be4b50e3bed0e8b ttfa=183ms total=0.90s audio=4.40s rtf=0.20
+2026-10-15 18:42:11,156 INFO vieneu_lite.api: fa241c3d05e34db98eed2e82397ac5d3 ttfa=179ms total=0.89s audio=4.40s rtf=0.20
+2026-10-15 18:42:11,157 INFO vieneu_lite.api: 3f829af6c32044f095cfd06bc4941c56 ttfa=178ms total=0.89s audio=4.24s rtf=0.21
+2026-10-15 18:42:11,159 INFO vieneu_lite.api: be41b22b23194322a6d75fb3bd604ee3 ttfa=183ms total=0.90s audio=4.32s rtf=0.21
+INFO:     127.0.0.1:33080 - "POST /benchmark/seed?seed=44 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33128 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33098 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33154 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33136 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33158 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33116 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33200 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33090 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33108 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33150 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33122 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33152 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33174 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33184 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33232 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33216 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33072 - "GET /benchmark HTTP/1.1" 200 OK
+2026-10-15 18:42:11,953 INFO vieneu_lite.api: e389414560d54c3491202186fb2b84f9 ttfa=185ms total=0.75s audio=3.76s rtf=0.20
+2026-10-15 18:42:12,039 INFO vieneu_lite.api: bfa46030283240a1846355c496834af6 ttfa=183ms total=0.84s audio=4.08s rtf=0.21
+2026-10-15 18:42:12,040 INFO vieneu_lite.api: a273829a55a54d34bb8c63f44f3e461c ttfa=181ms total=0.84s audio=4.00s rtf=0.21
+2026-10-15 18:42:12,042 INFO vieneu_lite.api: 88056d2c61474cd4a07404e48cac3734 ttfa=180ms total=0.84s audio=4.08s rtf=0.21
+2026-10-15 18:42:12,043 INFO vieneu_lite.api: 83c6d2d355f146bf92c3a56a8de92a2f ttfa=183ms total=0.84s audio=3.92s rtf=0.21
+2026-10-15 18:42:12,044 INFO vieneu_lite.api: 3d3714fdc8314373ad407e3f9b5e2c8b ttfa=188ms total=0.84s audio=3.84s rtf=0.22
+2026-10-15 18:42:12,045 INFO vieneu_lite.api: 0b23425c26094819a07ae3354e74f8a5 ttfa=181ms total=0.84s audio=4.08s rtf=0.21
+2026-10-15 18:42:12,046 INFO vieneu_lite.api: 5d665cbef57141ddba42e0029aa69d35 ttfa=184ms total=0.85s audio=4.00s rtf=0.21
+2026-10-15 18:42:12,047 INFO vieneu_lite.api: 64af0581da904f38b33c401dfc5d945f ttfa=183ms total=0.84s audio=4.00s rtf=0.21
+2026-10-15 18:42:12,074 INFO vieneu_lite.api: d92c0e46e6f94fdaa26e0dced8931bdd ttfa=185ms total=0.88s audio=4.16s rtf=0.21
+2026-10-15 18:42:12,075 INFO vieneu_lite.api: 72c51e1c3ce748fdb90ec1c613a6f8ec ttfa=185ms total=0.88s audio=4.24s rtf=0.21
+2026-10-15 18:42:12,076 INFO vieneu_lite.api: 4931de02991949b8b3fe591a6561e2a8 ttfa=183ms total=0.87s audio=4.16s rtf=0.21
+2026-10-15 18:42:12,077 INFO vieneu_lite.api: 4d7e0f2a7f0b44a1a992d2563f498196 ttfa=181ms total=0.87s audio=4.24s rtf=0.21
+2026-10-15 18:42:12,079 INFO vieneu_lite.api: 859a8e39db62443da67a8be2b42063a1 ttfa=189ms total=0.89s audio=4.16s rtf=0.21
+2026-10-15 18:42:12,080 INFO vieneu_lite.api: 7f4608ba424d44c8af6d09f86110bc9c ttfa=172ms total=0.89s audio=4.24s rtf=0.21
+2026-10-15 18:42:12,081 INFO vieneu_lite.api: 088b270e2ffe4a94ba2466f4eb2fbe7b ttfa=189ms total=0.89s audio=4.24s rtf=0.21
+INFO:     127.0.0.1:33236 - "POST /benchmark/seed?seed=45 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33260 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33244 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33264 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33290 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33296 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33320 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33262 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33332 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33294 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33268 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33304 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33316 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33278 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33336 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33346 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:33344 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+2026-10-15 18:42:12,938 INFO vieneu_lite.api: 1f5a207d29bb4a4fad5aaab3ac82e71b ttfa=186ms total=0.84s audio=4.08s rtf=0.21
+2026-10-15 18:42:12,940 INFO vieneu_lite.api: ab7bf6e89e0d4baea8dae33c00d145fa ttfa=186ms total=0.82s audio=4.00s rtf=0.21
+2026-10-15 18:42:12,943 INFO vieneu_lite.api: 981d17c8655146c6b869b4d791cd439a ttfa=194ms total=0.83s audio=4.08s rtf=0.20
+2026-10-15 18:42:12,943 INFO vieneu_lite.api: 90f3dfcf60114e578e433f7dad4e6a83 ttfa=187ms total=0.82s audio=4.00s rtf=0.21
+2026-10-15 18:42:12,945 INFO vieneu_lite.api: e0a1be9e985040cbbdae30dfda95cff0 ttfa=187ms total=0.83s audio=4.00s rtf=0.21
+2026-10-15 18:42:12,946 INFO vieneu_lite.api: 66627652dc7149528ce28bf5693ebc93 ttfa=186ms total=0.83s audio=3.84s rtf=0.22
+2026-10-15 18:42:12,947 INFO vieneu_lite.api: 568a50269b6b42f49d12cd3fef6df0b6 ttfa=203ms total=0.85s audio=4.08s rtf=0.21
+2026-10-15 18:42:13,024 INFO vieneu_lite.api: e4a6de4e0a074fe1b1cfea5f94fd8368 ttfa=188ms total=0.91s audio=4.16s rtf=0.22
+2026-10-15 18:42:13,025 INFO vieneu_lite.api: 2f47755d1acb4abcabc714af9be8cd34 ttfa=187ms total=0.91s audio=4.24s rtf=0.21
+2026-10-15 18:42:13,026 INFO vieneu_lite.api: 4bfd1d2faefc474c8878082024e0a0fd ttfa=194ms total=0.92s audio=4.16s rtf=0.22
+2026-10-15 18:42:13,028 INFO vieneu_lite.api: f9c7a044c08c4207afb44af658401730 ttfa=188ms total=0.91s audio=4.32s rtf=0.21
+2026-10-15 18:42:13,029 INFO vieneu_lite.api: 6421ef1af8ae459980a7ad409085eefb ttfa=189ms total=0.91s audio=4.32s rtf=0.21
+2026-10-15 18:42:13,030 INFO vieneu_lite.api: ada3caa9fffb45a19d57e236ff7bb47f ttfa=187ms total=0.91s audio=4.32s rtf=0.21
+2026-10-15 18:42:13,030 INFO vieneu_lite.api: 3a86c405f8144a8fb1acf788f847e8b2 ttfa=187ms total=0.91s audio=4.40s rtf=0.21
+2026-10-15 18:42:13,032 INFO vieneu_lite.api: a24c4dc8d4e040eaa51db5dbeefc64d0 ttfa=193ms total=0.92s audio=4.24s rtf=0.22
+2026-10-15 18:42:13,038 INFO vieneu_lite.api: 00ba40101c8349e781bf183b8fb0e408 ttfa=188ms total=0.92s audio=4.48s rtf=0.21
+INFO:     127.0.0.1:40218 - "POST /benchmark/seed?seed=46 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40256 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40288 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40222 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40304 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40268 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40278 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40312 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40232 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40240 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40290 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40308 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40280 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40334 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40326 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40328 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40342 - "POST /v1/audio/speech HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40354 - "GET /benchmark HTTP/1.1" 200 OK
+2026-10-15 18:42:13,845 INFO vieneu_lite.api: 1fab9a0934f74b0d8c91f36c3c8fd071 ttfa=183ms total=0.77s audio=3.68s rtf=0.21
+2026-10-15 18:42:13,926 INFO vieneu_lite.api: 406f4889ff7a441da085298e81574d2b ttfa=182ms total=0.85s audio=4.08s rtf=0.21
+2026-10-15 18:42:13,927 INFO vieneu_lite.api: 6495f1ac058e4c4b8a70e6093f517539 ttfa=188ms total=0.86s audio=4.08s rtf=0.21
+2026-10-15 18:42:13,928 INFO vieneu_lite.api: c3394d010a6b4cb9beafb5c12b90dee4 ttfa=184ms total=0.85s audio=4.00s rtf=0.21
+2026-10-15 18:42:13,930 INFO vieneu_lite.api: 48f0cafa7df34c20bb80a6526393dee0 ttfa=175ms total=0.84s audio=4.08s rtf=0.21
+2026-10-15 18:42:13,931 INFO vieneu_lite.api: 498343c6a0794f28b4a2253e5ddb8e17 ttfa=179ms total=0.85s audio=4.08s rtf=0.21
+2026-10-15 18:42:13,932 INFO vieneu_lite.api: cea3d5be4f914c8280b8881227738e85 ttfa=182ms total=0.85s audio=4.00s rtf=0.21
+2026-10-15 18:42:13,933 INFO vieneu_lite.api: ef668dbc9f074f92804f1d24405c9fa5 ttfa=184ms total=0.86s audio=4.08s rtf=0.21
+2026-10-15 18:42:13,934 INFO vieneu_lite.api: 240d0fb2c0424040a2d88e033602dff5 ttfa=178ms total=0.85s audio=3.92s rtf=0.22
+2026-10-15 18:42:13,935 INFO vieneu_lite.api: 0b50903f9bc94d98a715f629a21a8845 ttfa=185ms total=0.86s audio=3.84s rtf=0.22
+2026-10-15 18:42:13,937 INFO vieneu_lite.api: 7f8132cbcb1b41d58cda32068597f3fa ttfa=178ms total=0.85s audio=3.92s rtf=0.22
+2026-10-15 18:42:13,938 INFO vieneu_lite.api: 52f11d1cbaa54d1999a382412d5416c0 ttfa=184ms total=0.86s audio=3.92s rtf=0.22
+2026-10-15 18:42:13,983 INFO vieneu_lite.api: f768a97ffcd04404b1c4ca9e84d2bf9c ttfa=183ms total=0.91s audio=4.16s rtf=0.22
+2026-10-15 18:42:13,984 INFO vieneu_lite.api: 86760d4faad04596953f294cdebee596 ttfa=183ms total=0.91s audio=4.16s rtf=0.22
+2026-10-15 18:42:13,985 INFO vieneu_lite.api: ccebce5cd2b542e6b55fbeddc4b67084 ttfa=170ms total=0.91s audio=4.32s rtf=0.21
+2026-10-15 18:42:14,015 INFO vieneu_lite.api: ceda84ae419b400ca3cb71ec44aa5467 ttfa=184ms total=0.94s audio=4.72s rtf=0.20
+INFO:     127.0.0.1:40362 - "GET /benchmark HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40370 - "GET /results/bench-16.log HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40372 - "GET /results/bench-16.jsonl HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40382 - "GET /results/bench-16.gpu.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40390 - "GET /results/server-requests.jsonl HTTP/1.1" 200 OK
+✓ disconnected · App and GPU are still running; billing continues
+  Reconnect: vkong attach vk_b37c724fd417b0f8
+  Stop App and billing: vkong app stop vieneu-phase2

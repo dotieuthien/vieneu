@@ -1,0 +1,42 @@
+trace 2.0 s -> trace-20261015-185034.json.gz (open in https://ui.perfetto.dev)
+CUPTI adds ~1-2 us to every launch while tracing: compare regions, not absolutes.
+GPU busy 69.7% of the window; 368 idle gaps > 0.1 ms, 468 ms in total
+  stream 29     busy  54.8%  328710 ops
+  stream 33     busy  27.0%  29182 ops
+
+per region, per call, nested regions excluded (ms; launch = kernel/copy launches):
+region               calls     host  launch graph launch ms sync/copy gpu ops kernel ms  us/op  verdict
+text.split               3     2.93       0     0      0.00      0.00       0      0.00    0.0  CPU only
+text.phonemize           3     0.07       0     0      0.00      0.00       0      0.00    0.0  CPU only
+submit.prompt            3     1.10       0     0      0.00      0.00       0      0.00    0.0  CPU only
+watermark               30     0.14       0     0      0.00      0.00       0      0.00    0.0  CPU only
+worker.idle              3    43.77       0     0      0.00      0.00       0      0.00    0.0  CPU only
+admit                    3     6.48     117     0      1.02      0.04     119      0.22    1.9  launch/CPU-bound
+admit.prefill            3    30.85     736     0      5.85      0.03     738      4.57    6.2  launch/CPU-bound
+admit.load               3     1.82      37     0      0.30      0.07      43      0.10    2.3  launch/CPU-bound
+step                   111     0.10       0     0      0.00      0.00       0      0.00    0.0  CPU only
+step.replay            112     4.33       2     1      4.18      0.00    2915      9.84    3.4  GPU-bound
+step.status            111    11.00       2     0      0.77     10.82     218      4.20   19.3  waits on GPU
+decode                  31     0.67       3     0      0.03      0.00       3      0.01    1.9  launch/CPU-bound
+decode.backpressure     31     0.08       0     0      0.00      0.00       0      0.00    0.0  CPU only
+codec.idle              30    36.74       0     0      0.00      0.00       0      0.00    0.0  CPU only
+codec                   30     4.34      10     0      0.16      0.12      15      0.02    1.1  launch/CPU-bound
+codec.decode            30    22.46       8     0      0.47      0.06     101      1.48   14.6  launch/CPU-bound
+codec.d2h               30     1.89       0     0      0.00      1.69       1      0.01    5.3  waits on GPU
+
+top GPU ops by time:
+   16.2%     372x    715.0 us  fmha_cutlassF_f32_aligned_64x64_rf_sm80(PyTorchMemEffAttention::AttentionKernel<float, cutlass::arch
+    9.1%   10416x     14.3 us  void cutlass::Kernel2<cutlass_80_wmma_tensorop_bf16_s161616gemm_bf16_16x16_128x2_tn_align8>(cutlass_
+    8.1%    1344x     99.2 us  fmha_cutlassF_bf16_aligned_64x64_rf_sm80(PyTorchMemEffAttention::AttentionKernel<cutlass::bfloat16_t
+    6.0%    7504x     13.0 us  void cutlass::Kernel2<cutlass_80_wmma_tensorop_bf16_s161616gemm_bf16_32x32_128x2_tn_align8>(cutlass_
+    3.7%    1792x     34.2 us  fmha_cutlassF_bf16_aligned_64x128_rf_sm80(PyTorchMemEffAttention::AttentionKernel<cutlass::bfloat16_
+    3.4%     589x     94.5 us  ampere_sgemm_128x64_tn
+    3.1%   20851x      2.5 us  void at::native::elementwise_kernel<128, 2, at::native::gpu_kernel_impl_nocast<at::native::BinaryFun
+    2.4%   14595x      2.7 us  void at::native::reduce_kernel<512, 1, at::native::ReduceOp<float, at::native::MeanOps<float, float,
+    2.2%    5375x      6.7 us  void at::native::(anonymous namespace)::indexSelectSmallIndex<c10::BFloat16, long, unsigned int, 2, 
+    2.1%   13517x      2.6 us  void at::native::unrolled_elementwise_kernel<at::native::direct_copy_kernel_cuda(at::TensorIteratorB
+    2.0%    4700x      7.1 us  void at::native::vectorized_elementwise_kernel<4, at::native::compare_scalar_kernel<long>(at::Tensor
+    1.8%    1792x     16.9 us  void at::native::radixSortKVInPlace<2, -1, 32, 32, float, long, unsigned int>(at::cuda::detail::Tens
+    1.8%    8960x      3.4 us  void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl<at::native::BinaryFunctor<fl
+    1.5%   11155x      2.1 us  void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native::BinaryFun
+    1.3%    3696x      5.7 us  void at::native::reduce_kernel<512, 1, at::native::ReduceOp<float, at::native::ArgMaxOps<float>, uns

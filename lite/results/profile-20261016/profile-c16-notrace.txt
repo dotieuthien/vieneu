@@ -1,0 +1,92 @@
+window 8.2 s | host = wall time on its thread, nested regions excluded; gpu = CUDA-event span (incl. nested). ms unless noted.
+
+tick p50 9.4 ms -> 8.54x real time for every active stream (287 frames)
+
+region                calls  host p50       p99  total s  %win |   gpu p50       p99  what
+-- request threads
+text.split               80      2.27      5.42     0.20   2.4 |                      split the text into chunks
+text.phonemize           80      0.00      0.02     0.00   0.0 |                      phonemize one chunk
+submit.prompt            80      4.39     10.96     0.35   4.3 |                      tokenize one chunk's prompt
+watermark              1171      0.00      0.01     0.00   0.0 |                      watermark one audio chunk
+-- worker
+worker.idle               5     89.21    114.38     0.43   5.2 |                      worker waiting for requests
+admit                    10     26.73     68.10     0.39   4.8 |     57.85    125.71  newcomers: input embeddings, slicing the prefill KV
+admit.prefill            10     23.22     29.21     0.24   3.0 |     29.27     43.46  HF prefill of the newcomers (eager)
+admit.load               80      0.98     20.67     0.17   2.1 |      1.01      1.45  copy one prompt's KV into the ring cache (eager)
+step                    293      0.21     40.99     0.40   4.9 |                      per-slot bookkeeping after each frame (Python)
+step.replay             292      0.46      1.48     0.16   1.9 |      8.96     41.35  launch the frame graph; gpu = the frame
+step.status             292      8.41     23.80     3.33  40.5 |                      wait for the frame, read finished/length (sync)
+decode                   84      0.30      2.07     0.03   0.4 |      0.34      8.35  copy the new codes out of the ring, build the codec job
+decode.backpressure      84      0.01      7.93     0.02   0.3 |                      worker blocked: codec queue full
+tick.period             287      9.37    122.81     4.45  54.2 |                      one frame for every slot (real time: <= 80 ms)
+tick.gap                287                                    |      0.12    113.57  AR stream not running the graph between two frames
+-- codec
+codec.idle               84     20.64    237.32     2.34  28.5 |                      codec waiting for a job
+codec                    84     26.38     89.58     2.21  26.9 |                      codec job bookkeeping, splitting audio per row
+codec.decode             84      1.26      8.38     0.16   2.0 |     21.84     60.27  streaming codec over every row (eager)
+codec.d2h                84      0.37     48.17     0.50   6.1 |                      audio to host (sync)
+-- per text chunk
+req.queue                90     43.57     63.39     3.70  45.0 |                      submit -> taken by the worker
+req.admit                90    102.94    125.64     8.86 107.8 |                      taken -> in a slot (shared prefill)
+req.leadin               90     36.87    144.57     4.04  49.2 |                      in a slot -> first codec job packed
+req.codec_queue          90      1.30     12.06     0.28   3.4 |                      job packed -> codec starts it
+req.codec                90     18.08     58.68     2.21  26.8 |                      codec starts -> first audio out
+req.deliver              90      0.59      3.43     0.07   0.9 |                      first audio out -> read by the HTTP thread
+req.first_audio          90    204.73    271.65    19.15 233.0 |                      submit -> first audio read (no text work)
+req.total                90    921.93   1003.34    83.311013.8 |                      submit -> chunk done
+-- process
+gil.wait               3846      0.10      0.93     0.49   6.0 |                      a woken thread waiting for the GIL (+ ~0.1 ms timer slack)
+
+frame anatomy: one frame for all 16 slots (same cost whatever the occupancy)
+  eager: 1965 GPU ops, host 60.4 ms to launch them (31 us/op), GPU span 60.5 ms
+  graph: 1 launch, host 0.06 ms, GPU 8.9 ms; 2907 nodes, kernels 9.2 ms of a 9.3 ms span -> 0.2 ms of gaps between graph nodes (traced)
+  graph saves 51.6 ms per frame
+  sub-stages (eager, nested excluded; acoustic = decoder layers + embeddings + EOS head, backbone = without attention, eager = bookkeeping + input embeds):
+    frame.eager         131 ops     0.33 ms kernels ( 5.1%)    2.6 us/op
+    frame.acoustic     1041 ops     3.74 ms kernels (57.2%)    3.6 us/op
+    frame.sample         62 ops     0.15 ms kernels ( 2.4%)    2.5 us/op
+    frame.backbone      730 ops     2.22 ms kernels (33.9%)    3.0 us/op
+    frame.attn            1 ops     0.10 ms kernels ( 1.5%)   96.2 us/op
+
+trace 2.0 s -> trace-20261015-185034.json.gz (open in https://ui.perfetto.dev)
+CUPTI adds ~1-2 us to every launch while tracing: compare regions, not absolutes.
+GPU busy 69.7% of the window; 368 idle gaps > 0.1 ms, 468 ms in total
+  stream 29     busy  54.8%  328710 ops
+  stream 33     busy  27.0%  29182 ops
+
+per region, per call, nested regions excluded (ms; launch = kernel/copy launches):
+region               calls     host  launch graph launch ms sync/copy gpu ops kernel ms  us/op  verdict
+text.split               3     2.93       0     0      0.00      0.00       0      0.00    0.0  CPU only
+text.phonemize           3     0.07       0     0      0.00      0.00       0      0.00    0.0  CPU only
+submit.prompt            3     1.10       0     0      0.00      0.00       0      0.00    0.0  CPU only
+watermark               30     0.14       0     0      0.00      0.00       0      0.00    0.0  CPU only
+worker.idle              3    43.77       0     0      0.00      0.00       0      0.00    0.0  CPU only
+admit                    3     6.48     117     0      1.02      0.04     119      0.22    1.9  launch/CPU-bound
+admit.prefill            3    30.85     736     0      5.85      0.03     738      4.57    6.2  launch/CPU-bound
+admit.load               3     1.82      37     0      0.30      0.07      43      0.10    2.3  launch/CPU-bound
+step                   111     0.10       0     0      0.00      0.00       0      0.00    0.0  CPU only
+step.replay            112     4.33       2     1      4.18      0.00    2915      9.84    3.4  GPU-bound
+step.status            111    11.00       2     0      0.77     10.82     218      4.20   19.3  waits on GPU
+decode                  31     0.67       3     0      0.03      0.00       3      0.01    1.9  launch/CPU-bound
+decode.backpressure     31     0.08       0     0      0.00      0.00       0      0.00    0.0  CPU only
+codec.idle              30    36.74       0     0      0.00      0.00       0      0.00    0.0  CPU only
+codec                   30     4.34      10     0      0.16      0.12      15      0.02    1.1  launch/CPU-bound
+codec.decode            30    22.46       8     0      0.47      0.06     101      1.48   14.6  launch/CPU-bound
+codec.d2h               30     1.89       0     0      0.00      1.69       1      0.01    5.3  waits on GPU
+
+top GPU ops by time:
+   16.2%     372x    715.0 us  fmha_cutlassF_f32_aligned_64x64_rf_sm80(PyTorchMemEffAttention::AttentionKernel<float, cutlass::arch
+    9.1%   10416x     14.3 us  void cutlass::Kernel2<cutlass_80_wmma_tensorop_bf16_s161616gemm_bf16_16x16_128x2_tn_align8>(cutlass_
+    8.1%    1344x     99.2 us  fmha_cutlassF_bf16_aligned_64x64_rf_sm80(PyTorchMemEffAttention::AttentionKernel<cutlass::bfloat16_t
+    6.0%    7504x     13.0 us  void cutlass::Kernel2<cutlass_80_wmma_tensorop_bf16_s161616gemm_bf16_32x32_128x2_tn_align8>(cutlass_
+    3.7%    1792x     34.2 us  fmha_cutlassF_bf16_aligned_64x128_rf_sm80(PyTorchMemEffAttention::AttentionKernel<cutlass::bfloat16_
+    3.4%     589x     94.5 us  ampere_sgemm_128x64_tn
+    3.1%   20851x      2.5 us  void at::native::elementwise_kernel<128, 2, at::native::gpu_kernel_impl_nocast<at::native::BinaryFun
+    2.4%   14595x      2.7 us  void at::native::reduce_kernel<512, 1, at::native::ReduceOp<float, at::native::MeanOps<float, float,
+    2.2%    5375x      6.7 us  void at::native::(anonymous namespace)::indexSelectSmallIndex<c10::BFloat16, long, unsigned int, 2, 
+    2.1%   13517x      2.6 us  void at::native::unrolled_elementwise_kernel<at::native::direct_copy_kernel_cuda(at::TensorIteratorB
+    2.0%    4700x      7.1 us  void at::native::vectorized_elementwise_kernel<4, at::native::compare_scalar_kernel<long>(at::Tensor
+    1.8%    1792x     16.9 us  void at::native::radixSortKVInPlace<2, -1, 32, 32, float, long, unsigned int>(at::cuda::detail::Tens
+    1.8%    8960x      3.4 us  void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl<at::native::BinaryFunctor<fl
+    1.5%   11155x      2.1 us  void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native::BinaryFun
+    1.3%    3696x      5.7 us  void at::native::reduce_kernel<512, 1, at::native::ReduceOp<float, at::native::ArgMaxOps<float>, uns
