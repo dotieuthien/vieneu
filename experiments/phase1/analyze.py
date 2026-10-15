@@ -1,7 +1,7 @@
 """Recompute the phase 1 tables in PHASE1.md from the raw per-request files.
 
     python3 experiments/phase1/analyze.py                       # the committed 2026-10-13 run
-    python3 experiments/phase1/analyze.py --abba abba-lan2   # your own rerun (PHASE1.md)
+    python3 experiments/phase1/analyze.py --abba rerun   # your own rerun (PHASE1.md)
 
 Standard library only, no GPU. Inputs, per side (baseline = SDK, lite):
 

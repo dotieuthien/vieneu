@@ -230,7 +230,7 @@ Lệnh `POST /benchmark` không tự đo. Nó bảo server chạy client đo nga
 
 ```bash
 URL=http://127.0.0.1:PORT
-OUT=baseline/results/lan2/block-1-slots-16
+OUT=baseline/results/rerun/block-1-slots-16
 mkdir -p $OUT
 
 curl -X POST "$URL/benchmark?concurrency=1&repeats=15"   # bảo máy GPU bắt đầu đo 1 người dùng, 15 lượt
@@ -250,14 +250,14 @@ vkong attach vk_xxxx --update -C /tmp/p1/abba/lite
 
 - `--update` gửi thư mục `lite` lên đúng máy đó và bật lại server bằng code mới.
 - Thư viện đã cài ở bước 2 nên không cài lại.
-- Đo như bước 3, nhưng lưu vào `lite/results/lan2/block-2-slots-16`.
+- Đo như bước 3, nhưng lưu vào `lite/results/rerun/block-2-slots-16`.
 
 **Bước 5. Đo thêm lite một lần, rồi SDK một lần**
 
 Làm lại bước 4 thêm hai lần:
 
-- Với `lite`, lưu vào `lite/results/lan2/block-3-slots-16`.
-- Với `sdk`, lưu vào `baseline/results/lan2/block-4-slots-16`.
+- Với `lite`, lưu vào `lite/results/rerun/block-3-slots-16`.
+- Với `sdk`, lưu vào `baseline/results/rerun/block-4-slots-16`.
 
 Mỗi lần đo, sau mức 16 người dùng, đo thêm mức 32 người dùng với 32 ghế:
 
@@ -270,7 +270,7 @@ Mỗi lần đo, sau mức 16 người dùng, đo thêm mức 32 người dùng 
 
 ```bash
 vkong app stop vieneu-phase1 --yes        # Ctrl+C không trả máy; máy tính tiền tới khi stop
-python3 experiments/phase1/analyze.py --abba lan2
+python3 experiments/phase1/analyze.py --abba rerun   # tính bảng từ các file vừa lưu trong results/rerun/
 ```
 
 **Lưu ý**
