@@ -1,7 +1,9 @@
-# Tối ưu bản lite: đo, dự đoán, sửa trên VKong
+# Giai đoạn 2: đo rồi mới sửa (14–15/10/2026)
 
-Đây là nhật ký của lần tối ưu bản lite ngày 14–15/10/2026, kể theo đúng thứ tự đã làm: đo cái gì, từ số đo đoán ra
-điều gì, sửa ra sao, kiểm tra thế nào, và dùng VKong ở từng bước. Có ghi cả những lần đi sai đường.
+Hết [giai đoạn 1](PHASE1.md), bản lite chạy ngang SDK gốc, và lần thử cho codec chạy song song cũng chỉ nhích một
+chút. Giai đoạn này đổi cách làm: chưa sửa gì cả, đo trước đã. Dưới đây là nhật ký kể theo đúng thứ tự đã làm: đo cái
+gì, từ số đo đoán ra điều gì, sửa ra sao, kiểm tra thế nào, và dùng VKong ở từng bước. Có ghi cả những lần đi sai
+đường.
 
 Kết quả cuối, đo trên cùng một máy RTX 3060 với 16 ghế (slot):
 
@@ -10,9 +12,9 @@ Kết quả cuối, đo trên cùng một máy RTX 3060 với 16 ghế (slot):
 | Bản cũ | 0.402 | 0.538 | 124 ms | 294 ms |
 | Bản tối ưu | **0.175** | **0.250** | **76 ms** | 300 ms |
 
-**RTF** là thời gian làm chia cho độ dài âm thanh; dưới 1 là người nghe không bị ngắt. Không đụng vào model: trọng số,
-kiến trúc, kiểu số và cách sampling giữ nguyên. Âm thanh ra như cũ, tương quan 0.9999993 khi giải mã cùng một chuỗi mã.
-Video tóm tắt: [docs/optimize.mp4](docs/optimize.mp4).
+RTF là thời gian xử lý chia cho độ dài âm thanh. Dưới 1 thì người nghe không bị ngắt. Model được giữ nguyên: trọng
+số, kiến trúc, kiểu số và cách sampling đều không đổi. Âm thanh cũng không đổi: giải mã cùng một chuỗi mã thì tương
+quan 0.9999993. Video tóm tắt: [docs/optimize.mp4](docs/optimize.mp4).
 
 ## Vòng làm việc
 
@@ -36,18 +38,33 @@ Các cờ của `serve.py` dùng trong lúc đo (ghi vào dòng `start` của `l
 
 ## Bước 1. Gắn profiler (chưa cần GPU)
 
-**Mục tiêu.** Trả lời được "thời gian đi đâu": phía CPU hay GPU, có bị nghẽn ở việc ra lệnh (launch kernel) không,
-và từng request chờ ở chặng nào.
+**Mục tiêu.** Trả lời được câu hỏi "thời gian đi đâu": phía CPU hay phía GPU, có bị nghẽn ở việc ra lệnh (launch
+kernel) không, và mỗi request phải chờ ở chặng nào.
 
-**Làm gì.** Viết [profiler.py](lite/vieneu_lite/profiler.py), gắn vào scheduler, codec, frame và các thread request:
+**Làm gì.** Viết [profiler.py](lite/vieneu_lite/profiler.py) và gắn vào scheduler, codec, frame và các thread nhận
+request. Bật bằng `PROFILE=1`; khi tắt thì không tốn gì. Profiler cho biết:
 
-- mỗi vùng ghi thời gian CPU (đã trừ vùng con) và thời gian GPU (hai CUDA event trên đúng stream của vùng đó);
-- `tick.period` (một mẩu cho mọi ghế, phải dưới 80 ms), `tick.gap` (lúc GPU không chạy graph), `decode.backpressure`
-  (worker bị codec chặn), `gil.wait` (các thread tranh GIL);
-- TTFA của từng request tách thành: chờ tới lượt, nạp câu (admit/prefill), 2 mẩu đầu, chờ codec, codec, gửi đi;
-- frame anatomy lúc khởi động: chạy một mẩu bằng eager và bằng graph để đếm kernel;
-- `/profile/trace`: `torch.profiler` trên mọi thread, lưu file mở bằng [Perfetto](https://ui.perfetto.dev), kèm bảng
-  số lần launch, thời gian launch, thời gian sync và thời gian kernel của từng vùng.
+- **Từng vùng code:** thời gian CPU (đã trừ các vùng con) và thời gian GPU (đo bằng hai CUDA event trên đúng stream
+  của vùng đó).
+- **Nhịp của server:** `tick.period` là thời gian tạo một mẩu cho mọi ghế, phải dưới 80 ms mới kịp real time.
+  `tick.gap` là lúc GPU không chạy graph. `decode.backpressure` là lúc worker bị codec chặn. `gil.wait` cho biết các
+  thread có tranh nhau GIL không.
+- **Từng request:** thời gian tới tiếng đầu được tách thành chờ tới lượt, nạp câu, 2 mẩu đầu, chờ codec, codec, gửi đi.
+- **Frame anatomy:** lúc khởi động, chạy một mẩu bằng eager và bằng graph để đếm kernel, in ra log.
+- **Trace:** `torch.profiler` trên mọi thread, lưu file mở bằng [Perfetto](https://ui.perfetto.dev), kèm bảng số lần
+  launch, thời gian launch, thời gian sync và thời gian kernel của từng vùng.
+- **Watchdog:** có người dùng mà không có mẩu nào được tạo trong 30 giây thì in stack của mọi thread. GPU treo không
+  để lại lỗi Python nào, nên đây là bằng chứng duy nhất.
+
+Cách dùng khi server đang chạy:
+
+```bash
+curl -X POST "$SERVE_URL/profile/reset"             # bắt đầu một cửa sổ đo mới
+# ... cho tải chạy ...
+curl "$SERVE_URL/profile"                           # bảng tổng hợp (?format=json cho máy đọc)
+curl -X POST "$SERVE_URL/profile/trace?seconds=2"   # trace 2 giây, lưu vào results/profile/
+curl -O "$SERVE_URL/results/profile/<file>.json.gz" # tải trace về, kéo thả vào ui.perfetto.dev
+```
 
 **Hai cái bẫy đã thấy trước khi thuê máy,** bằng cách đọc source torch 2.8 và chạy thử trên CPU ở máy local:
 
