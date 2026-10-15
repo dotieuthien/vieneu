@@ -15,4 +15,4 @@ init_cmd: pip install -r requirements.txt
 # WATERMARK=0 to match the baseline benchmark (baseline passes apply_watermark=False).
 # PROFILE=1 turns the profiler on (vieneu_lite/profiler.py); files under results/profile/,
 # served at /results/profile/. BENCH_MODE=1 enables /benchmark?repeats=N on the GPU host.
-start: env PROFILE=1 BENCH_MODE=1 CODEC_VERIFY=1 MAX_STREAMS=32 WATERMARK=0 OMP_NUM_THREADS=4 python -u serve.py
+start: env PROFILE=1 BENCH_MODE=1 CODEC_VERIFY=1 MAX_STREAMS=16 WATERMARK=0 OMP_NUM_THREADS=4 python -u serve.py

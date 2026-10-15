@@ -202,13 +202,17 @@ nó đang chứa bước số mấy, rồi mask chỉ cho mỗi bước nhìn 6 
 Bước 11 nhìn bước 6 tới 11, giống hệt cache cũ, dù các bước này nằm rải ở ô 6, 7, 0, 1, 2, 3.
 
 **Tiết kiệm được bao nhiêu với cửa sổ thật.** Dữ liệu KV phải ghi cho mỗi lần gọi codec (4 mẩu), cộng qua cả 12 lớp.
-Mỗi ô là key + value của một bước, 2 KB:
+Mỗi ô là key + value của một bước, 2 KB. Cả codec gốc lẫn codec mới đều tính đủ mọi ghế dành sẵn (`MAX_STREAMS`), kể cả
+ghế trống, nên với 16 ghế thì con số là cột cuối, dù chỉ có 1 người dùng:
 
-| Cách làm | Ô phải ghi, 1 người | Dữ liệu, 1 người | Dữ liệu, 16 ghế |
+| Cách làm | Ô phải ghi, mỗi ghế | Dữ liệu, mỗi ghế | Dữ liệu, 16 ghế |
 |---|---:|---:|---:|
 | Codec gốc, giải mã từng mẩu | ~199 nghìn | ~408 MB | ~6.5 GB |
 | Gom 4 mẩu, KV vẫn kiểu cũ | ~50 nghìn | ~103 MB | ~1.65 GB |
 | Gom 4 mẩu + mảng vòng | 768 | ~1.6 MB | ~25 MB |
+
+Đây là lượng dữ liệu phải ghi, không phải bộ nhớ chiếm. KV của codec chỉ chiếm khoảng 25 MB mỗi ghế (khoảng 406 MB cho
+16 ghế); code gốc ghi đi ghi lại cùng vùng nhớ đó nhiều lần trong mỗi lần gọi.
 
 Đo thực tế (16 ghế, cùng một máy, bảng ở bước 7), so "gom + CUDA graph" với "gom + CUDA graph + mảng vòng":
 
@@ -217,8 +221,7 @@ Mỗi ô là key + value của một bước, 2 KB:
 | 1 người dùng | 32.1 → 22.3 ms | 0.209 → 0.175 |
 | 16 người dùng | 33.1 → 22.1 ms | 0.307 → 0.250 |
 
-- Codec mới luôn tính đủ 16 ghế, kể cả ghế trống, nên cột 16 ghế là con số thật dù chỉ có 1 người dùng. Vì vậy mức
-  tiết kiệm gần như không đổi giữa 1 và 16 người.
+- Vì codec luôn tính đủ 16 ghế, mức tiết kiệm gần như không đổi giữa 1 và 16 người dùng.
 - Bớt 1.65 GB ghi, cộng phần đọc tương đương, với băng thông bộ nhớ 360 GB/s của RTX 3060, là khoảng 9–10 ms. Con số
   này khớp với khoảng 10 ms đo được.
 - Mảng vòng chỉ bỏ phần chép. Attention vẫn đọc cả cửa sổ ở mỗi lần gọi, ở cả hai cách.
